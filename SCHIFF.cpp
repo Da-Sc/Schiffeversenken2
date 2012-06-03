@@ -1,16 +1,15 @@
 #include "SCHIFF.h"
 
-SCHIFF::SCHIFF(int tmplaenge, SPIELFELD* tmpfeld)
+SCHIFF::SCHIFF()
 {
     //ctor
-    Schifflaenge=tmplaenge;
-    *ausSchiffleinBestehend=new SCHIFFLEIN[Schifflaenge];
-    for(int i=0; i<Schifflaenge; i++)
-    {
-        ausSchiffleinBestehend[i]=new SCHIFFLEIN(this);
-    }
+}
 
+SCHIFF::SCHIFF(SPIELFELD* tmpfeld)
+{
+    //ctor
     tmpfeld=aufFeld;
+    ausSchiffleinBestehend=0;
 }
 
 SCHIFF::~SCHIFF()
@@ -19,6 +18,16 @@ SCHIFF::~SCHIFF()
     for(int i=0; i<Schifflaenge; i++)
     {
         delete ausSchiffleinBestehend[i];
+    }
+}
+
+void SCHIFF::legeSchifflaengefest(int tmplaenge)
+{
+    Schifflaenge=tmplaenge;
+    *ausSchiffleinBestehend=new SCHIFFLEIN[Schifflaenge];
+    for(int i=0; i<Schifflaenge; i++)
+    {
+        ausSchiffleinBestehend[i]=new SCHIFFLEIN(this);
     }
 }
 
@@ -34,10 +43,15 @@ bool SCHIFF::setzeaufSpielfeld(int* x, int* y)
 
 bool SCHIFF::istVersenkt()
 {
-    return !(Schifflaenge-nochSchwimmend);
+    if(!(Schifflaenge-nochSchwimmendeTeile))
+    {
+        aufFeld->Schiffversenkt();
+        return true;
+    }
+    return false;
 }
 
 void SCHIFF::getroffen()
 {
-    nochSchwimmend--;
+    nochSchwimmendeTeile--;
 }

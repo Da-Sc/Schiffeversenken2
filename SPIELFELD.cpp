@@ -1,6 +1,14 @@
 #include "SPIELFELD.h"
 
-SPIELFELD::SPIELFELD(int Spielernummer)
+SPIELFELD::SPIELFELD()
+{
+    //default konst
+    Besitzer=-1;
+    Feld=0;
+    AnzahlnochschwimmenderSchiffe=0;
+}
+
+SPIELFELD::SPIELFELD(int Spielernummer, int tmpSchiffe)
 {
     //ctor
     if(!(Spielernummer==0 || Spielernummer==1))Besitzer=-1;//Fehler
@@ -15,13 +23,23 @@ SPIELFELD::SPIELFELD(int Spielernummer)
         Feld[i][j] = new EINZELNES_FELD();
     }
 
-
+    AnzahlnochschwimmenderSchiffe=tmpSchiffe;
+    *gesetzteSchiffe=new SCHIFF[AnzahlnochschwimmenderSchiffe];
+    for(int i=0; i<AnzahlnochschwimmenderSchiffe; i++)
+    {
+        (gesetzteSchiffe[i])=new SCHIFF(this);
+    }
 
 }
 
 SPIELFELD::~SPIELFELD()
 {
     //dtor
+}
+
+void SPIELFELD::legeSchifflaengefest(int tmpnummer, int tmplaenge)
+{
+    (gesetzteSchiffe[tmpnummer])->legeSchifflaengefest(tmplaenge);
 }
 
 bool SPIELFELD::ersetzedurchSchifflein(SCHIFFLEIN* zusetzendesSchiffsteil, int x, int y)
@@ -48,4 +66,9 @@ int SPIELFELD::Schuss(int x, int y)//überprüft Schuss auf gültigkeit und füh
     if( ((Feld[x][y])->istVersenkt()) ) tmprueckgabe++;
     return tmprueckgabe;
 
+}
+
+void SPIELFELD::Schiffversenkt()
+{
+    AnzahlnochschwimmenderSchiffe--;
 }
