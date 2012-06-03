@@ -1,10 +1,15 @@
-//#include "SPIEL.h"
-//#include "SPIELFELD.h"
+#include "SPIEL.h"
+
+/*
+ARRAY aus POINTER richtig einsetzen:
+KLASSE **test;
+test = new KLASSE*[3]; -> default konstruktor muss vorhanden sein
+for(i...) test[i]=new KLASSE(irgendwas, 123);
+*/
+
 
 int main()
 {
-    //SPIELFELD* *Testfeld;
-    //*Testfeld = new SPIELFELD[5];
-    //SPIEL *Testspiel = new SPIEL();
+    SPIEL *Testspiel = new SPIEL();
     return 0;
 }

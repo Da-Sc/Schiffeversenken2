@@ -11,7 +11,7 @@ class SPIEL
         virtual ~SPIEL();
     protected:
     private:
-        SPIELFELD* *Meer;//2 spielfelder
+        SPIELFELD* Meer[2];//2 spielfelder
         int AnzahlSchiffe;
         int* Schifflaenge;
 };

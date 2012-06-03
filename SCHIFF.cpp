@@ -24,7 +24,7 @@ SCHIFF::~SCHIFF()
 void SCHIFF::legeSchifflaengefest(int tmplaenge)
 {
     Schifflaenge=tmplaenge;
-    *ausSchiffleinBestehend=new SCHIFFLEIN[Schifflaenge];
+    ausSchiffleinBestehend=new SCHIFFLEIN*[Schifflaenge];
     for(int i=0; i<Schifflaenge; i++)
     {
         ausSchiffleinBestehend[i]=new SCHIFFLEIN(this);

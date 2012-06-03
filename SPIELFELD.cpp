@@ -14,8 +14,8 @@ SPIELFELD::SPIELFELD(int Spielernummer, int tmpSchiffe)
     if(!(Spielernummer==0 || Spielernummer==1))Besitzer=-1;//Fehler
     else Besitzer=Spielernummer;
 
-    **Feld = new EINZELNES_FELD[10];
-    for(int i=0; i<10; i++) *(Feld[i])=new EINZELNES_FELD[10];
+    Feld = new EINZELNES_FELD**[10];
+    for(int i=0; i<10; i++) (Feld[i])=new EINZELNES_FELD*[10];
 
     for(int i=0; i<10; i++)
     {
@@ -24,7 +24,7 @@ SPIELFELD::SPIELFELD(int Spielernummer, int tmpSchiffe)
     }
 
     AnzahlnochschwimmenderSchiffe=tmpSchiffe;
-    *gesetzteSchiffe=new SCHIFF[AnzahlnochschwimmenderSchiffe];
+    gesetzteSchiffe=new SCHIFF*[AnzahlnochschwimmenderSchiffe];
     for(int i=0; i<AnzahlnochschwimmenderSchiffe; i++)
     {
         (gesetzteSchiffe[i])=new SCHIFF(this);

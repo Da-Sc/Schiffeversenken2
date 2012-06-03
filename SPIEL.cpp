@@ -14,7 +14,6 @@ SPIEL::SPIEL()
 	}while(AnzahlSchiffe<1 || AnzahlSchiffe>5);
 
 	//2 Spielfelder erzeugen
-	(*Meer)=new SPIELFELD[2];
     for(int i=0; i<2; i++) (Meer[i])=new SPIELFELD(i, AnzahlSchiffe);
 
 	//Schiffe anlegen
