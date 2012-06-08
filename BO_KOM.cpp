@@ -60,3 +60,9 @@ int BO_KOM::intErfragen()
 
     return tmp;
 }
+
+bool BO_KOM::positionErfragen(int* position, int laengearray)//laengearray == 2
+{
+	if(laengearray!=2) return false;
+	else return true;
+}

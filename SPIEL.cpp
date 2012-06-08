@@ -34,8 +34,41 @@ SPIEL::SPIEL()
 		else
 		{
             Schifflaenge[i]=Laengetmp;
-		    for(int j=0; j<2; j++) (Meer[j])->legeSchifflaengefest(j,Laengetmp);
+		    for(int j=0; j<2; j++) (Meer[j])->legeSchifflaengefest(i,Laengetmp);
 		}
+	}
+}
+
+void SPIEL::setzeSchiffe(int Spieler)
+{
+	int tmpPositionAnfang[2];//0=x, 1=y
+	int tmpPositionEnde[2];//0=x, 1=y
+	//test
+	tmpPositionAnfang[0]=0;
+	tmpPositionAnfang[1]=1;
+	tmpPositionEnde[0]=0;
+	tmpPositionEnde[1]=0;
+	//test ende
+
+	BO_KOM::holeInstanz()->textAusgeben("Spieler ",true); //bei allen ausgeben -> anderer Spieler auch informiert
+	BO_KOM::holeInstanz()->zahlAusgeben(Spieler+1,true);
+	BO_KOM::holeInstanz()->textAusgeben(" bitte Schiffe setzen: ",true);
+
+	for(int i=0; i<AnzahlSchiffe; i++)
+	{
+		BO_KOM::holeInstanz()->textAusgeben("Schiff ",true); //bei allen ausgeben -> anderer Spieler auch informiert
+		BO_KOM::holeInstanz()->zahlAusgeben(i+1,true);
+		BO_KOM::holeInstanz()->textAusgeben(" Anfang: ",true);
+		BO_KOM::holeInstanz()->positionErfragen(tmpPositionAnfang, 2);
+		
+		BO_KOM::holeInstanz()->textAusgeben("Schiff ",true); 
+		BO_KOM::holeInstanz()->zahlAusgeben(i+1,true);
+		BO_KOM::holeInstanz()->textAusgeben(" Ende: ",true);
+		BO_KOM::holeInstanz()->positionErfragen(tmpPositionEnde, 2);
+
+		//test
+		if(Meer[Spieler]->setzeSchiff(tmpPositionAnfang,tmpPositionEnde,i)) BO_KOM::holeInstanz()->textAusgeben("gesetzt ",true);
+		else BO_KOM::holeInstanz()->textAusgeben("NICHT gesetzt ",true);
 	}
 }
 

@@ -14,9 +14,10 @@ class SCHIFF
         SCHIFF(SPIELFELD*);
         virtual ~SCHIFF();
         void legeSchifflaengefest(int);
+		int holeSchifflaenge();
+		bool SCHIFF::setzeaufSpielfeld(int*, int*);
         bool istVersenkt();
         void getroffen();
-        bool setzeaufSpielfeld(int*,int*);
     protected:
     private:
         int Schifflaenge;

@@ -3,12 +3,16 @@
 SCHIFF::SCHIFF()
 {
     //ctor
+	Schifflaenge=0;
+	nochSchwimmendeTeile=0;
+	ausSchiffleinBestehend=0;
+	aufFeld=0;
 }
 
 SCHIFF::SCHIFF(SPIELFELD* tmpfeld)
 {
     //ctor
-    tmpfeld=aufFeld;
+    aufFeld=tmpfeld;
     ausSchiffleinBestehend=0;
 }
 
@@ -31,14 +35,18 @@ void SCHIFF::legeSchifflaengefest(int tmplaenge)
     }
 }
 
+int SCHIFF::holeSchifflaenge()
+{
+	return Schifflaenge;
+}
+
 bool SCHIFF::setzeaufSpielfeld(int* x, int* y)
 {
-    for(int i=0; i<Schifflaenge; i++)
+	for(int i=0; i<Schifflaenge; i++)
     {
         if(!aufFeld->ersetzedurchSchifflein(ausSchiffleinBestehend[i],x[i],y[i])) return false;
     }
-    return true;
-
+	return true;
 }
 
 bool SCHIFF::istVersenkt()

@@ -11,5 +11,8 @@ for(i...) test[i]=new KLASSE(irgendwas, 123);
 int main()
 {
     SPIEL *Testspiel = new SPIEL();
+	Testspiel->setzeSchiffe(0);
+
+	system("pause");
     return 0;
 }

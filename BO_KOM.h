@@ -13,8 +13,8 @@ class BO_KOM
         virtual ~BO_KOM();
         virtual void textAusgeben(char*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
         virtual void zahlAusgeben(int, bool);
-        int intErfragen();
-        //void positionErfragen(int*);
+        int intErfragen();// am besten noch überladen, fürs netzwerk wenns wichtig wird wer gefragt wird!
+        bool positionErfragen(int*, int);
     protected://private auch in vererbten aber trotzdem verfügbar
         BO_KOM();//damit genau eine Instanz von BO_KOM existiert: http://www.oop-trainer.de/Themen/Singleton.html
     private:
