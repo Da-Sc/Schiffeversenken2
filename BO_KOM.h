@@ -2,6 +2,8 @@
 #define BO_KOM_H
 
 #include <iostream>
+#include <iomanip>
+#include "GLOBALEFUNKTIONEN.h"
 
 //Benutzeroberfläche Kommandozeile
 //benutzen mit: BO_KOM::holeInstanz()->

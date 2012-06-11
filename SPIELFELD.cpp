@@ -59,10 +59,9 @@ bool SPIELFELD::setzeSchiff(int* positionAnfang, int* positionEnde, int tmpSchif
 	{
 		if(positionAnfang[i]>9 || positionAnfang[i]<0 || positionEnde[i]>9 || positionEnde[i]<0) return false;
 	}
-
 	//überprüfen: passt die Länge, ist es eine reihe
 	//setze einzelne Positionen
-	if( (positionAnfang[0]==positionEnde[0] && betrag(positionAnfang[1]-positionEnde[1]+1)==tmpSchifflaenge) )
+	if( (positionAnfang[0]==positionEnde[0] && betrag(positionAnfang[1]-positionEnde[1])+1==tmpSchifflaenge) )
 	{
 		for(int i=0; i<tmpSchifflaenge; i++)
 		{
@@ -70,12 +69,12 @@ bool SPIELFELD::setzeSchiff(int* positionAnfang, int* positionEnde, int tmpSchif
 			y[i]=kleineres(positionAnfang[1],positionEnde[1])+i;
 		}
 	}
-	else if( (positionAnfang[1]==positionEnde[1] && betrag(positionAnfang[0]-positionEnde[0]+1)==tmpSchifflaenge) )
+	else if( (positionAnfang[1]==positionEnde[1] && betrag(positionAnfang[0]-positionEnde[0])+1==tmpSchifflaenge) )
 	{
 		for(int i=0; i<tmpSchifflaenge; i++)
 		{
-			y[i]=positionAnfang[0];
-			x[i]=kleineres(positionAnfang[1],positionEnde[1])+i;
+			y[i]=positionAnfang[1];
+			x[i]=kleineres(positionAnfang[0],positionEnde[0])+i;
 		}
 	}
 	else return false;
@@ -129,5 +128,5 @@ int betrag(int zahl)
 int kleineres(int a, int b)
 {
 	if(a<=b) return a;
-	if(b<a) return b;
+	return b;
 }
