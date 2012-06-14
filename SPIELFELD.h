@@ -4,12 +4,10 @@
 #include "EINZELNES_FELD.h"
 #include "SCHIFFLEIN.h"
 #include "SCHIFF.h"
+#include "GLOBALEFUNKTIONEN.h"
 
 class SCHIFFLEIN;
 class SCHIFF;
-
-int betrag(int);
-int kleineres(int, int);
 
 class SPIELFELD
 {
@@ -22,6 +20,7 @@ class SPIELFELD
         bool ersetzedurchSchifflein(SCHIFFLEIN*,int, int);//x,y von 0 bis 9
         int Schuss(int,int);//Rückgabe: -1 Fehler; 0 Wasser; 1 Schiff; 2 versenkt
         void Schiffversenkt();
+        char zeigeSpielfeldteilfuer(int, int, int);//int: für welchen Spieler ausgeben (0,1,2=einzelSpielerausgabe), int, int: x,y koordinate); Rückgabe: (später zu enum!, oder klasse)
     protected:
     private:
         int Besitzer;

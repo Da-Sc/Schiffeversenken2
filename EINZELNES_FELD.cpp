@@ -25,3 +25,7 @@ bool EINZELNES_FELD::istVersenkt()
 {
     return false;
 }
+bool EINZELNES_FELD::istGetroffen()
+{
+    return getroffen;
+}

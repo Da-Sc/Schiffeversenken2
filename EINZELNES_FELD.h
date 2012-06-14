@@ -10,6 +10,7 @@ class EINZELNES_FELD
         virtual bool beschossen();//Schuss auf das einzelnen Feld ruft das auf-> überprüft ob schon mal darauf geschossen wurde
         virtual bool istSchiff();
         virtual bool istVersenkt();
+        bool istGetroffen();
     protected:
         bool getroffen;
     private:

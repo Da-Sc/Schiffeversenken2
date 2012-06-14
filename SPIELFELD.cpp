@@ -46,7 +46,7 @@ bool SPIELFELD::istdaeinSchiff(int* x, int* y, int laengeArray)
 {
 	for(int i=0; i<laengeArray;i++) if(Feld[x[i]][y[i]]->istSchiff())return true;
 	return false;
-	
+
 }
 
 bool SPIELFELD::setzeSchiff(int* positionAnfang, int* positionEnde, int tmpSchiffnummer)//evtl. später noch durch differenzierte fehlermeldungen ersetzen
@@ -101,11 +101,11 @@ bool SPIELFELD::ersetzedurchSchifflein(SCHIFFLEIN* zusetzendesSchiffsteil, int x
     return true;
 }
 
-int SPIELFELD::Schuss(int x, int y)//überprüft Schuss auf gültigkeit und führt ihn aus bei <0 Fehler, 0 Wasser, 1 Schiff, 2 versenkt
+int SPIELFELD::Schuss(int x, int y)//überprüft Schuss auf gültigkeit und führt ihn aus. Bei <0 Fehler, 0 Wasser, 1 Schiff, 2 versenkt
 {
     //Fehler beim Schuss aufs angegebene Feld?
     if(x>9 || y>9 || x<0 || y<0) return -1;
-    if( !((Feld[x][y])->beschossen()) ) return -1;
+    if( !((Feld[x][y])->beschossen()) ) return -1;//ausführung falls möglich
 
     //was ist eigentlich genau passiert?
     if( !((Feld[x][y])->istSchiff()) ) return 0;
@@ -120,13 +120,57 @@ void SPIELFELD::Schiffversenkt()
     AnzahlnochschwimmenderSchiffe--;
 }
 
-int betrag(int zahl)
+char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
+//Rückgabe:
+//Schiff: s
+//Schifftreffer: X
+//Schiffversenkt: V
+//Wasser oder unbekannt 0 (Zeichen!!!)
+//Wassertreffer: W
 {
-	if(zahl >= 0) return zahl;
-	return zahl*(-1);
-}
-int kleineres(int a, int b)
-{
-	if(a<=b) return a;
-	return b;
+    if(tmpSpieler<0 || tmpSpieler>2 || tmpx>9 || tmpy>9 || tmpx<0 || tmpy<0) return 0;
+
+    //alles ausgeben
+    if(tmpSpieler==Besitzer)
+    {
+        //Schiff?
+        if( ((Feld[tmpx][tmpy])->istSchiff()) )
+        {
+            //getroffen?
+            if( ((Feld[tmpx][tmpy])->istGetroffen()) )
+            {
+                if( ((Feld[tmpx][tmpy])->istVersenkt()) )
+                {
+                    return 'V';
+                }
+                else{return 'X';}
+            }
+            else{return 's';}
+        }
+        //->Wasser
+        else
+        {
+            if(((Feld[tmpx][tmpy])->istGetroffen())) return 'W';
+            return '0';
+        }
+    }
+    //nur was gegner bekannt
+    else
+    {
+        //Schiff?
+        if( ((Feld[tmpx][tmpy])->istSchiff()) )
+        {
+            //getroffen?
+            if( ((Feld[tmpx][tmpy])->istGetroffen()) ) return 'X';
+            return '0';
+        }
+        //->Wasser
+        else
+        {
+            if(((Feld[tmpx][tmpy])->istGetroffen())) return 'W';
+            return '0';
+        }
+    }
+
+    return 0;
 }

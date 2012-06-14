@@ -63,9 +63,9 @@ void SPIEL::setzeSchiffe(int Spieler)
 		{
 			BO_KOM::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben:",true);
 		}
-		
-		
-		BO_KOM::holeInstanz()->textAusgeben("Schiff ",true); 
+
+
+		BO_KOM::holeInstanz()->textAusgeben("Schiff ",true);
 		BO_KOM::holeInstanz()->zahlAusgeben(i+1,true);
 		BO_KOM::holeInstanz()->textAusgeben(" Ende: ",true);
 		while(!(BO_KOM::holeInstanz()->positionErfragen(tmpPositionEnde, 2)))
@@ -99,4 +99,31 @@ void SPIEL::setzeSchiffe(int Spieler)
 SPIEL::~SPIEL()
 {
     //dtor
+}
+
+void SPIEL::zeigeSpielfelder(bool alles)
+{
+    char auszugebendesSpielfeld[300];
+    int tmpzaehler=0;
+    int allesoderallgemein=2;
+    for(int zeile=9; zeile>=0; zeile--)
+    {
+        for(int spieler=0; spieler<2; spieler++)
+        {
+            for(int spalte=0; spalte<10; spalte++)
+            {
+                if(alles) allesoderallgemein=spieler;
+                auszugebendesSpielfeld[tmpzaehler]=Meer[spieler]->zeigeSpielfeldteilfuer(allesoderallgemein,spalte,zeile);
+                tmpzaehler++;
+            }
+            for(int i=0; i<3; i++)
+            {
+                auszugebendesSpielfeld[tmpzaehler]=' ';
+                tmpzaehler++;
+            }
+        }
+        auszugebendesSpielfeld[tmpzaehler]='\n';
+        tmpzaehler++;
+    }
+    BO_KOM::holeInstanz()->textAusgeben(auszugebendesSpielfeld, true);
 }

@@ -15,10 +15,13 @@ for(i...) test[i]=new KLASSE(irgendwas, 123);
 int main()
 {
     SPIEL *Testspiel = new SPIEL();
-	
+
 
 	//TESTS
 	Testspiel->setzeSchiffe(0);
+	Testspiel->setzeSchiffe(1);
+
+	Testspiel->zeigeSpielfelder(true);
 	/*int testar[2];
 
 	if(BO_KOM::holeInstanz()->positionErfragen(testar, 2))
@@ -27,6 +30,6 @@ int main()
 	}*/
 	//TESTSENDE
 
-	system("pause");
+	//system("pause");
     return 0;
 }
