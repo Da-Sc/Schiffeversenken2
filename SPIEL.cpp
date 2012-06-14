@@ -50,7 +50,7 @@ void SPIEL::setzeSchiffe(int Spieler)
 	tmpPositionEnde[1]=0;
 	//ende
 
-	BO_KOM::holeInstanz()->textAusgeben("Spieler ",true); //bei allen ausgeben -> anderer Spieler auch informiert
+	BO_KOM::holeInstanz()->textAusgeben("SPIELER ",true); //bei allen ausgeben -> anderer Spieler auch informiert
 	BO_KOM::holeInstanz()->zahlAusgeben(Spieler+1,true);
 	BO_KOM::holeInstanz()->textAusgeben(" bitte Schiffe setzen:\n",true);
 
@@ -74,19 +74,19 @@ void SPIEL::setzeSchiffe(int Spieler)
 		}
 
 		//testausgaben
-		BO_KOM::holeInstanz()->zahlAusgeben(tmpPositionAnfang[0],true);
+		/*BO_KOM::holeInstanz()->zahlAusgeben(tmpPositionAnfang[0],true);
 		BO_KOM::holeInstanz()->textAusgeben(" : ",true);
 		BO_KOM::holeInstanz()->zahlAusgeben(tmpPositionAnfang[1],true);
 		BO_KOM::holeInstanz()->textAusgeben("\n",true);
 		BO_KOM::holeInstanz()->zahlAusgeben(tmpPositionEnde[0],true);
 		BO_KOM::holeInstanz()->textAusgeben(" : ",true);
 		BO_KOM::holeInstanz()->zahlAusgeben(tmpPositionEnde[1],true);
-		BO_KOM::holeInstanz()->textAusgeben("\n",true);
+		BO_KOM::holeInstanz()->textAusgeben("\n",true);*/
 		//testausgaben
 
 		if(Meer[Spieler]->setzeSchiff(tmpPositionAnfang,tmpPositionEnde,i))
 		{
-			BO_KOM::holeInstanz()->textAusgeben("Schiff erfolgreich gesetzt.\n",true);
+			BO_KOM::holeInstanz()->textAusgeben("Schiff erfolgreich gesetzt.\n\n",true);
 		}
 		else
 		{
@@ -94,6 +94,7 @@ void SPIEL::setzeSchiffe(int Spieler)
 			i--;
 		}
 	}
+	BO_KOM::holeInstanz()->textAusgeben("\n",true);
 }
 
 SPIEL::~SPIEL()
@@ -103,9 +104,22 @@ SPIEL::~SPIEL()
 
 void SPIEL::zeigeSpielfelder(bool alles)
 {
-    char auszugebendesSpielfeld[300];
+    char auszugebendesSpielfeld[600];
+    for(int i=0; i<600; i++)
+    {
+        auszugebendesSpielfeld[i]=0;
+    }
     int tmpzaehler=0;
     int allesoderallgemein=2;
+
+    char spielerchar[35]={'S','p','i','e','l','e','r',' ','1',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','p','i','e','l','e','r',' ','2','\n'};
+
+    for(int i=0; i<35; i++)
+    {
+        auszugebendesSpielfeld[i]=spielerchar[i];
+        tmpzaehler++;
+    }
+
     for(int zeile=9; zeile>=0; zeile--)
     {
         for(int spieler=0; spieler<2; spieler++)
@@ -115,8 +129,10 @@ void SPIEL::zeigeSpielfelder(bool alles)
                 if(alles) allesoderallgemein=spieler;
                 auszugebendesSpielfeld[tmpzaehler]=Meer[spieler]->zeigeSpielfeldteilfuer(allesoderallgemein,spalte,zeile);
                 tmpzaehler++;
+                auszugebendesSpielfeld[tmpzaehler]=' ';
+                tmpzaehler++;
             }
-            for(int i=0; i<3; i++)
+            for(int i=0; i<5; i++)
             {
                 auszugebendesSpielfeld[tmpzaehler]=' ';
                 tmpzaehler++;
