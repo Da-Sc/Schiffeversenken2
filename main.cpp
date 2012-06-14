@@ -21,7 +21,10 @@ int main()
 	Testspiel->setzeSchiffe(0);
 	Testspiel->setzeSchiffe(1);
 
-	Testspiel->zeigeSpielfelder(true);
+    //Testspiel->zeigeSpielfelder(0);
+    //Testspiel->zeigeSpielfelder(1);
+    //Testspiel->zeigeSpielfelder(2);
+	Testspiel->zeigeSpielfelder(3);
 	/*int testar[2];
 
 	if(BO_KOM::holeInstanz()->positionErfragen(testar, 2))

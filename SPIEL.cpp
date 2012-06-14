@@ -7,6 +7,8 @@ SPIEL::SPIEL()
 
     //grundlegende Regeln (#Schiffe und Größe)
     BO_KOM::holeInstanz()->textAusgeben("Neues Spiel gestartet\n",false);//beim Spiel ausgeben
+    BO_KOM::holeInstanz()->begruessung();
+    BO_KOM::holeInstanz()->textAusgeben("\nAllgemeine Regeln vereinbaren:\n\n",true);
 	do{
 		BO_KOM::holeInstanz()->textAusgeben("Bitte die Anzahl an Schiffen (1-5) eingeben: ",false);//beim Spiel ausgeben
 		AnzahlSchiffe=BO_KOM::holeInstanz()->intErfragen();
@@ -50,6 +52,10 @@ void SPIEL::setzeSchiffe(int Spieler)
 	tmpPositionEnde[1]=0;
 	//ende
 
+    BO_KOM::holeInstanz()->konsoleLoeschen();
+	BO_KOM::holeInstanz()->hinweis();
+
+//Feld zum orientieren Ausgeben!!!
 	BO_KOM::holeInstanz()->textAusgeben("SPIELER ",true); //bei allen ausgeben -> anderer Spieler auch informiert
 	BO_KOM::holeInstanz()->zahlAusgeben(Spieler+1,true);
 	BO_KOM::holeInstanz()->textAusgeben(" bitte Schiffe setzen:\n",true);
@@ -58,7 +64,9 @@ void SPIEL::setzeSchiffe(int Spieler)
 	{
 		BO_KOM::holeInstanz()->textAusgeben("Schiff ",true); //bei allen ausgeben -> anderer Spieler auch informiert
 		BO_KOM::holeInstanz()->zahlAusgeben(i+1,true);
-		BO_KOM::holeInstanz()->textAusgeben(" Anfang: ",true);
+		BO_KOM::holeInstanz()->textAusgeben(" (Länge: ",true);
+		BO_KOM::holeInstanz()->zahlAusgeben(Schifflaenge[i],true);
+		BO_KOM::holeInstanz()->textAusgeben(") Anfang: ",true);
 		while(!(BO_KOM::holeInstanz()->positionErfragen(tmpPositionAnfang, 2)))
 		{
 			BO_KOM::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben:",true);
@@ -94,7 +102,7 @@ void SPIEL::setzeSchiffe(int Spieler)
 			i--;
 		}
 	}
-	BO_KOM::holeInstanz()->textAusgeben("\n",true);
+	BO_KOM::holeInstanz()->konsoleLoeschen();
 }
 
 SPIEL::~SPIEL()
@@ -102,10 +110,15 @@ SPIEL::~SPIEL()
     //dtor
 }
 
-void SPIEL::zeigeSpielfelder(bool alles)
+void SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
 {
-    char auszugebendesSpielfeld[600];
-    for(int i=0; i<600; i++)
+    if(zeigenfuer<0 || zeigenfuer>3) return;
+
+    bool alles=false;
+    if(zeigenfuer==3) alles=true;
+
+    char auszugebendesSpielfeld[700];
+    for(int i=0; i<700; i++)
     {
         auszugebendesSpielfeld[i]=0;
     }
@@ -113,12 +126,19 @@ void SPIEL::zeigeSpielfelder(bool alles)
     int allesoderallgemein=2;
 
     char spielerchar[35]={'S','p','i','e','l','e','r',' ','1',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','p','i','e','l','e','r',' ','2','\n'};
+    char zahlen[46]={'1',' ','2',' ','3',' ','4',' ','5',' ','6',' ','7',' ','8',' ','9',' ','1','0',' ',' ',' ',' ',' ','1',' ','2',' ','3',' ','4',' ','5',' ','6',' ','7',' ','8',' ','9',' ','1','0','\n'};
 
     for(int i=0; i<35; i++)
     {
-        auszugebendesSpielfeld[i]=spielerchar[i];
+        auszugebendesSpielfeld[tmpzaehler]=spielerchar[i];
         tmpzaehler++;
     }
+    for(int i=0; i<46; i++)
+    {
+        auszugebendesSpielfeld[tmpzaehler]=zahlen[i];
+        tmpzaehler++;
+    }
+
 
     for(int zeile=9; zeile>=0; zeile--)
     {
@@ -126,8 +146,8 @@ void SPIEL::zeigeSpielfelder(bool alles)
         {
             for(int spalte=0; spalte<10; spalte++)
             {
-                if(alles) allesoderallgemein=spieler;
-                auszugebendesSpielfeld[tmpzaehler]=Meer[spieler]->zeigeSpielfeldteilfuer(allesoderallgemein,spalte,zeile);
+                if(alles) zeigenfuer=spieler;
+                auszugebendesSpielfeld[tmpzaehler]=Meer[spieler]->zeigeSpielfeldteilfuer(zeigenfuer,spalte,zeile);
                 tmpzaehler++;
                 auszugebendesSpielfeld[tmpzaehler]=' ';
                 tmpzaehler++;

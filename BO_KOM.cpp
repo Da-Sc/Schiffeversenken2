@@ -4,6 +4,7 @@ BO_KOM::BO_KOM()
 {
     //ctor
     zustand=true;
+    hinweisausgegeben=false;
 }
 
 BO_KOM::~BO_KOM()
@@ -109,4 +110,26 @@ bool BO_KOM::positionErfragen(int* position, int laengearray)//laengearray == 2,
 	}
 
 	return true;
+}
+
+void BO_KOM::begruessung()
+{
+    std::cout << "Willkommen zu einer Partie Schiffeversenken." << std::endl;
+    std::cout << "Da diese Partie an einem PC stattfindet, ist es unumgänglich fair zu spielen und während der Gegner seine Schiffe setzt wegzuschauen!" << std::endl;
+    std::cout << "Viel Spaß" << std:: endl;
+}
+
+void BO_KOM::hinweis()
+{
+    if(!hinweisausgegeben)
+    {
+        hinweisausgegeben=true;
+        std::cout << std::endl << "Nun können die Schiffe einzeln gesetzt werden. Das Terminal wird nach erfolgter Eingabe eines Spielers gelöscht." << std::endl;
+        std::cout << "Bitte schaut weg, wenn euer Gegner seine Schiffe setzt!" << std::endl << std::endl;
+    }
+}
+
+void BO_KOM::konsoleLoeschen()
+{
+    system("clear");
 }
