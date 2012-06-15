@@ -101,7 +101,7 @@ bool SPIELFELD::ersetzedurchSchifflein(SCHIFFLEIN* zusetzendesSchiffsteil, int x
     return true;
 }
 
-int SPIELFELD::Schuss(int x, int y)//überprüft Schuss auf gültigkeit und führt ihn aus. Bei <0 Fehler, 0 Wasser, 1 Schiff, 2 versenkt
+int SPIELFELD::Schuss(int x, int y)//überprüft Schuss auf gültigkeit und führt ihn aus. Bei -1 Fehler, 0 Wasser, 1 Schiff, 2 versenkt
 {
     //Fehler beim Schuss aufs angegebene Feld?
     if(x>9 || y>9 || x<0 || y<0) return -1;
@@ -174,7 +174,6 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
 
     return 0;
 }
-
 bool SPIELFELD::verloren()
 {
     return !AnzahlnochschwimmenderSchiffe;

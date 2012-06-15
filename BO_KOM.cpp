@@ -1,3 +1,12 @@
+#ifdef __unix__
+  #define KONSOLELOESCHEN "clear"
+#elif _WIN32
+  #define KONSOLELOESCHEN "cls"
+#else
+  #define KONSOLELOESCHEN ""
+#endif
+
+
 #include "BO_KOM.h"
 #include <cstring>
 
@@ -132,12 +141,13 @@ void BO_KOM::hinweis()
 
 void BO_KOM::konsoleLoeschen()
 {
-    system("clear");
+    system(KONSOLELOESCHEN);
 }
 
 void BO_KOM::spielfeldAusgabe(char* grundlageninfos)
 {
-    if(std::strlen(grundlageninfos)!=200) return;
+
+    if(std::strlen(grundlageninfos)!=200) return;//strln durch abschliessendes 0 bestimmt!!!
 
     char auszugebendesSpielfeld[750];
     for(int i=0; i<750; i++)

@@ -14,6 +14,7 @@ SCHIFF::SCHIFF(SPIELFELD* tmpfeld)
     //ctor
     aufFeld=tmpfeld;
     ausSchiffleinBestehend=0;
+	nochSchwimmendeTeile=0;
 }
 
 SCHIFF::~SCHIFF()
@@ -28,6 +29,7 @@ SCHIFF::~SCHIFF()
 void SCHIFF::legeSchifflaengefest(int tmplaenge)
 {
     Schifflaenge=tmplaenge;
+	nochSchwimmendeTeile=Schifflaenge;
     ausSchiffleinBestehend=new SCHIFFLEIN*[Schifflaenge];
     for(int i=0; i<Schifflaenge; i++)
     {
@@ -51,7 +53,7 @@ bool SCHIFF::setzeaufSpielfeld(int* x, int* y)
 
 bool SCHIFF::istVersenkt()
 {
-    if(!(Schifflaenge-nochSchwimmendeTeile))
+    if(!nochSchwimmendeTeile)
     {
         aufFeld->Schiffversenkt();
         return true;

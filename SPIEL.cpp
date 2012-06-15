@@ -122,8 +122,8 @@ void SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
     bool alles=false;
     if(zeigenfuer==3) alles=true;
 
-    char auszugebendesSpielfeld[200];
-    for(int i=0; i<200; i++)
+    char auszugebendesSpielfeld[201];
+    for(int i=0; i<201; i++)
     {
         auszugebendesSpielfeld[i]=0;
     }
@@ -209,7 +209,7 @@ void SPIEL::spielen(int anderreihe)
     BO_KOM::holeInstanz()->textAusgeben(" auf: ",true);
     BO_KOM::holeInstanz()->positionErfragen(schussaufposition,2);
 
-    ergebnis=Meer[anderreihe]->Schuss(schussaufposition[0],schussaufposition[1]);
+    ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition[0],schussaufposition[1]);
     if(ergebnis<-1 || ergebnis>2) return;
 
     //Fehler
@@ -220,7 +220,7 @@ void SPIEL::spielen(int anderreihe)
         BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
         BO_KOM::holeInstanz()->textAusgeben(" bitte widerholen: ",true);
         BO_KOM::holeInstanz()->positionErfragen(schussaufposition,2);
-        ergebnis=Meer[anderreihe]->Schuss(schussaufposition[0],schussaufposition[1]);
+        ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition[0],schussaufposition[1]);
     }
 
     //Wasser
@@ -235,12 +235,14 @@ void SPIEL::spielen(int anderreihe)
     {
         BO_KOM::holeInstanz()->textAusgeben("TREFFER ! :) \n",true);
         if(ergebnis==2) BO_KOM::holeInstanz()->textAusgeben("Schiff VERSENKT ;) \n",true);
-        BO_KOM::holeInstanz()->textAusgeben("Du bist erneut an der Reihe! \n",true);
         if(Meer[(anderreihe+1)%2]->verloren())
         {
-            BO_KOM::holeInstanz()->textAusgeben("\n\nDu hast GEWONNEN!!!\n",true);
+            BO_KOM::holeInstanz()->textAusgeben("\n\nSpieler",true);
+			BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
+			BO_KOM::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
             return;
         }
+		BO_KOM::holeInstanz()->textAusgeben("Du bist erneut an der Reihe! \n",true);
         spielen(anderreihe);
     }
 }

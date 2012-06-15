@@ -35,6 +35,6 @@ int main()
 	}*/
 	//TESTSENDE
 
-	//system("pause");
+	system("pause");
     return 0;
 }
