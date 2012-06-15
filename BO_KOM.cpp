@@ -28,7 +28,7 @@ void BO_KOM::textAusgeben(char* text)
     std::cout << text << std::flush;
 }
 
-void BO_KOM::textAusgeben(char* text, bool anAlle)
+void BO_KOM::textAusgeben(char* text, bool)
 {
     textAusgeben(text);
 }
@@ -38,7 +38,7 @@ void BO_KOM::zahlAusgeben(int zahl)
     std::cout << zahl << std::flush;
 }
 
-void BO_KOM::zahlAusgeben(int zahl, bool anAlle)
+void BO_KOM::zahlAusgeben(int zahl, bool)
 {
     zahlAusgeben(zahl);
 }
@@ -50,12 +50,12 @@ int BO_KOM::intErfragen()
 
     while(std::cin.bad() || std::cin.fail())
     {
-		    std::cin.clear();
+            std::cin.clear();
             std::cin.ignore(100, '\n');
             tmp=0;
-			textAusgeben("Falsche Eingabe, bitte Wiederholen: ");
-			std::cin >> tmp;
-			zustand=false;
+            textAusgeben("Falsche Eingabe, bitte Wiederholen: ");
+            std::cin >> tmp;
+            zustand=false;
 	}
 	zustand=true;
 	std::cout << std::endl;

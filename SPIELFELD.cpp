@@ -174,3 +174,8 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
 
     return 0;
 }
+
+bool SPIELFELD::verloren()
+{
+    return !AnzahlnochschwimmenderSchiffe;
+}

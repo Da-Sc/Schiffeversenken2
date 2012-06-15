@@ -114,7 +114,7 @@ SPIEL::~SPIEL()
     //dtor
 }
 
-//GROSSTEILS IN DIE BENUTZEROBERFLÄCHE VERSCHIEBEN !!!!!!!
+
 void SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
 {
     if(zeigenfuer<0 || zeigenfuer>3) return;
@@ -215,12 +215,12 @@ void SPIEL::spielen(int anderreihe)
     //Fehler
     while(ergebnis<0)
     {
-        ergebnis=Meer[anderreihe]->Schuss(schussaufposition[0],schussaufposition[1]);
         BO_KOM::holeInstanz()->textAusgeben("Ausführung nicht möglich! Evtl. wurde dieses Feld bereits beschossen.\n",true);
         BO_KOM::holeInstanz()->textAusgeben("SPIELER ",true);
         BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
         BO_KOM::holeInstanz()->textAusgeben(" bitte widerholen: ",true);
         BO_KOM::holeInstanz()->positionErfragen(schussaufposition,2);
+        ergebnis=Meer[anderreihe]->Schuss(schussaufposition[0],schussaufposition[1]);
     }
 
     //Wasser
@@ -236,6 +236,11 @@ void SPIEL::spielen(int anderreihe)
         BO_KOM::holeInstanz()->textAusgeben("TREFFER ! :) \n",true);
         if(ergebnis==2) BO_KOM::holeInstanz()->textAusgeben("Schiff VERSENKT ;) \n",true);
         BO_KOM::holeInstanz()->textAusgeben("Du bist erneut an der Reihe! \n",true);
+        if(Meer[(anderreihe+1)%2]->verloren())
+        {
+            BO_KOM::holeInstanz()->textAusgeben("\n\nDu hast GEWONNEN!!!\n",true);
+            return;
+        }
         spielen(anderreihe);
     }
 }
