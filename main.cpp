@@ -25,6 +25,8 @@ int main()
     //Testspiel->zeigeSpielfelder(1);
     //Testspiel->zeigeSpielfelder(2);
 	Testspiel->zeigeSpielfelder(3);
+
+	Testspiel->spielen(-1);
 	/*int testar[2];
 
 	if(BO_KOM::holeInstanz()->positionErfragen(testar, 2))

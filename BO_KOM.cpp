@@ -1,4 +1,5 @@
 #include "BO_KOM.h"
+#include <cstring>
 
 BO_KOM::BO_KOM()
 {
@@ -132,4 +133,70 @@ void BO_KOM::hinweis()
 void BO_KOM::konsoleLoeschen()
 {
     system("clear");
+}
+
+void BO_KOM::spielfeldAusgabe(char* grundlageninfos)
+{
+    if(std::strlen(grundlageninfos)!=200) return;
+
+    char auszugebendesSpielfeld[750];
+    for(int i=0; i<750; i++)
+    {
+        auszugebendesSpielfeld[i]=0;
+    }
+
+    int tmpzaehler=0;
+    int buchstabenzaehler=0;
+    char spielerchar[37]={'S','p','i','e','l','e','r',' ','1',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','p','i','e','l','e','r',' ','2','\n'};
+    char zahlen[52]={' ',' ','1',' ','2',' ','3',' ','4',' ','5',' ','6',' ','7',' ','8',' ','9',' ','1','0',' ',' ',' ',' ',' ',' ',' ','1',' ','2',' ','3',' ','4',' ','5',' ','6',' ','7',' ','8',' ','9',' ','1','0','\n','A',' '};
+
+    for(int i=0; i<37; i++)
+    {
+        auszugebendesSpielfeld[tmpzaehler]=spielerchar[i];
+        tmpzaehler++;
+    }
+    for(int i=0; i<52; i++)
+    {
+        auszugebendesSpielfeld[tmpzaehler]=zahlen[i];
+        tmpzaehler++;
+    }
+
+    for(int i=0; i<200; i++)
+    {
+        auszugebendesSpielfeld[tmpzaehler]=grundlageninfos[i];
+        tmpzaehler++;
+        auszugebendesSpielfeld[tmpzaehler]=' ';
+        tmpzaehler++;
+        if((i+1)%10==0)
+        {
+            if((i+1)%20==0)
+            {
+                auszugebendesSpielfeld[tmpzaehler]='\n';
+                tmpzaehler++;
+                if(i<199)
+                {
+                    auszugebendesSpielfeld[tmpzaehler]=65+buchstabenzaehler;
+                    tmpzaehler++;
+                    auszugebendesSpielfeld[tmpzaehler]=' ';
+                    tmpzaehler++;
+                }
+
+            }
+            else
+            {
+                for(int j=0; j<5; j++)
+                {
+                    auszugebendesSpielfeld[tmpzaehler]=' ';
+                    tmpzaehler++;
+                }
+                auszugebendesSpielfeld[tmpzaehler]=65+buchstabenzaehler;
+                tmpzaehler++;
+                buchstabenzaehler++;
+                auszugebendesSpielfeld[tmpzaehler]=' ';
+                tmpzaehler++;
+            }
+        }
+    }
+
+    textAusgeben(auszugebendesSpielfeld,true);
 }

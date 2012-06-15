@@ -21,6 +21,7 @@ class BO_KOM
         virtual void begruessung();
         virtual void hinweis();
         virtual void konsoleLoeschen();
+        virtual void spielfeldAusgabe(char*);
     protected://private auch in vererbten aber trotzdem verfügbar
         BO_KOM();//damit genau eine Instanz von BO_KOM existiert: http://www.oop-trainer.de/Themen/Singleton.html
     private:
