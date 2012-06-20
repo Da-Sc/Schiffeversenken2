@@ -72,54 +72,50 @@ int BO_KOM::intErfragen()
     return tmp;
 }
 
-bool BO_KOM::positionErfragen(int* position, int laengearray)//laengearray == 2, code: z.B. a10 oder f2
+bool BO_KOM::positionErfragen(POSITION* position)
 {
-	if(laengearray!=2) return false;
-	char tmpc[4];
-	for(int i=0;i<4;i++)tmpc[i]=0;
-	zustand=true;
+        char tmpc[4];
+        for(int i=0;i<4;i++)tmpc[i]=0;
+        zustand=true;
 
-	std::cin >> std::setw(4) >> tmpc;
-	//std::cin.getline(tmpc, 4);
+        std::cin >> std::setw(4) >> tmpc;
 
-	//überprüfen auf cin Fehler
-	if(std::cin.bad() || std::cin.fail())
-    {
-		    std::cin.clear();
+        //überprüfen auf cin Fehler
+        if(std::cin.bad() || std::cin.fail())
+        {
+            std::cin.clear();
             std::cin.ignore(100, '\n');
-			zustand=false;
-			return false;
-	}
+            zustand=false;
+            return false;
+        }
 
-	//überprüfen ob zahlen oder buchstaben a-j eingegeben wurden
-	for(int i=0; i<2; i++)
-	{
-		if( tmpc[i]<49 || (tmpc[i]>57 && tmpc[i]<65) || (tmpc[i]>74 && tmpc[i]<97) || tmpc[i]>107 )
-		{
-			std::cin.ignore(100, '\n');
-			zustand=false;
-			return false;
-		}
-	}
+        //überprüfen ob zahlen oder buchstaben a-j eingegeben wurden
+        for(int i=0; i<2; i++)
+        {
+                if( tmpc[i]<49 || (tmpc[i]>57 && tmpc[i]<65) || (tmpc[i]>74 && tmpc[i]<97) || tmpc[i]>107 )
+                {
+                        std::cin.ignore(100, '\n');
+                        zustand=false;
+                        return false;
+                }
+        }
 
-	//erstes Zeichen (Buchstabe) A -> 9 ... J -> 0
-	if(tmpc[0]<97) tmpc[0]+=32;
-	if( !(tmpc[0]>96 && tmpc[0]<107) ) return false;
-	position[1]=buchstabeZuArrayposition(tmpc[0]);
+        //erstes Zeichen (Buchstabe) A -> 9 ... J -> 0
+        if(tmpc[0]<97) tmpc[0]+=32;
+        if( !(tmpc[0]>96 && tmpc[0]<107) || !(position->setzePositionY(buchstabeZuArrayposition(tmpc[0]))) ) return false;
 
-	//zweites und drittes Zeichen
-	if(tmpc[2]==0)
-	{
-		if(tmpc[1]>57 || tmpc[1]<49) return false;
-		position[0]=(int)((tmpc[1]-49));
-	}
-	else
-	{
-		if(tmpc[1]!=49 || tmpc[2]!=48) return false;
-		position[0]=9;
-	}
+        //zweites und drittes Zeichen
+        if(tmpc[2]==0)
+        {
+                if(tmpc[1]>57 || tmpc[1]<49 || !(position->setzePositionX((int)((tmpc[1]-49)))) ) return false;
+        }
+        else
+        {
+                if(tmpc[1]!=49 || tmpc[2]!=48) return false;
+                position->setzePositionX(9);
+        }
 
-	return true;
+        return true;
 }
 
 void BO_KOM::begruessung()

@@ -6,6 +6,7 @@ SPIEL::SPIEL()
     //ctor
 
     //grundlegende Regeln (#Schiffe und Größe)
+    BO_KOM::holeInstanz()->konsoleLoeschen();
     BO_KOM::holeInstanz()->textAusgeben("Neues Spiel gestartet\n",false);//beim Spiel ausgeben
     BO_KOM::holeInstanz()->begruessung();
     BO_KOM::holeInstanz()->textAusgeben("\nAllgemeine Regeln vereinbaren:\n\n",true);
@@ -43,16 +44,10 @@ SPIEL::SPIEL()
 
 void SPIEL::setzeSchiffe(int Spieler)
 {
-	int tmpPositionAnfang[2];//0=x, 1=y
-	int tmpPositionEnde[2];//0=x, 1=y
-	//zum Abfangen von Fehlern
-	tmpPositionAnfang[0]=0;
-	tmpPositionAnfang[1]=0;
-	tmpPositionEnde[0]=0;
-	tmpPositionEnde[1]=0;
-	//ende
+        POSITION *tmpPositionAnfang=new POSITION();
+        POSITION *tmpPositionEnde=new POSITION();
 
-    BO_KOM::holeInstanz()->konsoleLoeschen();
+        BO_KOM::holeInstanz()->konsoleLoeschen();
 	BO_KOM::holeInstanz()->hinweis();
 
 //Feld zum orientieren Ausgeben!!!
@@ -71,7 +66,7 @@ void SPIEL::setzeSchiffe(int Spieler)
 		BO_KOM::holeInstanz()->textAusgeben(" (Länge: ",true);
 		BO_KOM::holeInstanz()->zahlAusgeben(Schifflaenge[i],true);
 		BO_KOM::holeInstanz()->textAusgeben(") Anfang: ",true);
-		while(!(BO_KOM::holeInstanz()->positionErfragen(tmpPositionAnfang, 2)))
+                while(!(BO_KOM::holeInstanz()->positionErfragen(tmpPositionAnfang)))
 		{
 			BO_KOM::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben:",true);
 		}
@@ -80,7 +75,7 @@ void SPIEL::setzeSchiffe(int Spieler)
 		BO_KOM::holeInstanz()->textAusgeben("Schiff ",true);
 		BO_KOM::holeInstanz()->zahlAusgeben(i+1,true);
 		BO_KOM::holeInstanz()->textAusgeben(" Ende: ",true);
-		while(!(BO_KOM::holeInstanz()->positionErfragen(tmpPositionEnde, 2)))
+                while(!(BO_KOM::holeInstanz()->positionErfragen(tmpPositionEnde)))
 		{
 			BO_KOM::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben:",true);
 		}
@@ -143,50 +138,6 @@ void SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
         }
     }
     BO_KOM::holeInstanz()->spielfeldAusgabe(auszugebendesSpielfeld);
-
-/*
-    char spielerchar[37]={'S','p','i','e','l','e','r',' ','1',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','p','i','e','l','e','r',' ','2','\n'};
-    char zahlen[50]={' ',' ','1',' ','2',' ','3',' ','4',' ','5',' ','6',' ','7',' ','8',' ','9',' ','1','0',' ',' ',' ',' ',' ',' ',' ','1',' ','2',' ','3',' ','4',' ','5',' ','6',' ','7',' ','8',' ','9',' ','1','0','\n'};
-
-    for(int i=0; i<37; i++)
-    {
-        auszugebendesSpielfeld[tmpzaehler]=spielerchar[i];
-        tmpzaehler++;
-    }
-    for(int i=0; i<50; i++)
-    {
-        auszugebendesSpielfeld[tmpzaehler]=zahlen[i];
-        tmpzaehler++;
-    }
-
-
-    for(int zeile=9; zeile>=0; zeile--)
-    {
-        for(int spieler=0; spieler<2; spieler++)
-        {
-                    auszugebendesSpielfeld[tmpzaehler]=74-zeile;
-                    tmpzaehler++;
-                    auszugebendesSpielfeld[tmpzaehler]=' ';
-                    tmpzaehler++;
-
-            for(int spalte=0; spalte<10; spalte++)
-            {
-                if(alles) zeigenfuer=spieler;
-                auszugebendesSpielfeld[tmpzaehler]=Meer[spieler]->zeigeSpielfeldteilfuer(zeigenfuer,spalte,zeile);
-                tmpzaehler++;
-                auszugebendesSpielfeld[tmpzaehler]=' ';
-                tmpzaehler++;
-            }
-            for(int i=0; i<5; i++)
-            {
-                auszugebendesSpielfeld[tmpzaehler]=' ';
-                tmpzaehler++;
-            }
-        }
-        auszugebendesSpielfeld[tmpzaehler]='\n';
-        tmpzaehler++;
-    }
-    BO_KOM::holeInstanz()->textAusgeben(auszugebendesSpielfeld, true);*/
 }
 
 void SPIEL::spielen(int anderreihe)
@@ -199,7 +150,7 @@ void SPIEL::spielen(int anderreihe)
         BO_KOM::holeInstanz()->textAusgeben("SPIELSTART\n",true);
     }
 
-    int schussaufposition[2];
+    POSITION *schussaufposition =new POSITION();
     int ergebnis=-1;
 
     zeigeSpielfelder(2);
@@ -207,9 +158,9 @@ void SPIEL::spielen(int anderreihe)
     BO_KOM::holeInstanz()->textAusgeben("Schuss von SPIELER ",true);
     BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
     BO_KOM::holeInstanz()->textAusgeben(" auf: ",true);
-    BO_KOM::holeInstanz()->positionErfragen(schussaufposition,2);
+    BO_KOM::holeInstanz()->positionErfragen(schussaufposition);
 
-    ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition[0],schussaufposition[1]);
+    ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
     if(ergebnis<-1 || ergebnis>2) return;
 
     //Fehler
@@ -219,30 +170,30 @@ void SPIEL::spielen(int anderreihe)
         BO_KOM::holeInstanz()->textAusgeben("SPIELER ",true);
         BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
         BO_KOM::holeInstanz()->textAusgeben(" bitte widerholen: ",true);
-        BO_KOM::holeInstanz()->positionErfragen(schussaufposition,2);
-        ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition[0],schussaufposition[1]);
+        BO_KOM::holeInstanz()->positionErfragen(schussaufposition);
+        ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
     }
 
     //Wasser
     if(ergebnis==0)
     {
-        BO_KOM::holeInstanz()->textAusgeben("WASSER :( \n\n",true);
+        BO_KOM::holeInstanz()->textAusgeben("--- WASSER --- :( \n\n",true);
         spielen((anderreihe+1)%2);
     }
 
     //Schiff
     if(ergebnis>0)
     {
-        BO_KOM::holeInstanz()->textAusgeben("TREFFER ! :) \n",true);
+        BO_KOM::holeInstanz()->textAusgeben("=== TREFFER ! === :) \n",true);
         if(ergebnis==2) BO_KOM::holeInstanz()->textAusgeben("Schiff VERSENKT ;) \n",true);
         if(Meer[(anderreihe+1)%2]->verloren())
         {
             BO_KOM::holeInstanz()->textAusgeben("\n\nSpieler",true);
-			BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
-			BO_KOM::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
+            BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
+            BO_KOM::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
             return;
         }
-		BO_KOM::holeInstanz()->textAusgeben("Du bist erneut an der Reihe! \n",true);
+        BO_KOM::holeInstanz()->textAusgeben("Du bist ERNEUT an der Reihe! \n",true);
         spielen(anderreihe);
     }
 }

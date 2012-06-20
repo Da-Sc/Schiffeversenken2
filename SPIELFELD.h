@@ -5,6 +5,7 @@
 #include "SCHIFFLEIN.h"
 #include "SCHIFF.h"
 #include "GLOBALEFUNKTIONEN.h"
+#include "POSITION.h"
 
 class SCHIFFLEIN;
 class SCHIFF;
@@ -16,7 +17,7 @@ class SPIELFELD
         SPIELFELD(int,int);
         virtual ~SPIELFELD();
         void legeSchifflaengefest(int,int);
-		bool setzeSchiff(int*,int*,int);
+        bool setzeSchiff(POSITION*,POSITION*,int);
         bool ersetzedurchSchifflein(SCHIFFLEIN*,int, int);//x,y von 0 bis 9
         int Schuss(int,int);//Rückgabe: -1 Fehler; 0 Wasser; 1 Schiff; 2 versenkt
         void Schiffversenkt();

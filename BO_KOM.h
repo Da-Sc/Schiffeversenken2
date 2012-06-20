@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <stdlib.h>
 #include "GLOBALEFUNKTIONEN.h"
+#include "POSITION.h"
 
 //Benutzeroberfläche Kommandozeile
 //benutzen mit: BO_KOM::holeInstanz()->
@@ -17,7 +18,7 @@ class BO_KOM
         virtual void textAusgeben(char*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
         virtual void zahlAusgeben(int, bool);
         virtual int intErfragen();// am besten noch überladen, fürs netzwerk wenns wichtig wird wer gefragt wird!
-        virtual bool positionErfragen(int*, int);
+        virtual bool positionErfragen(POSITION*);
         virtual void begruessung();
         virtual void hinweis();
         virtual void konsoleLoeschen();

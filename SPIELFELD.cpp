@@ -49,7 +49,7 @@ bool SPIELFELD::istdaeinSchiff(int* x, int* y, int laengeArray)
 
 }
 
-bool SPIELFELD::setzeSchiff(int* positionAnfang, int* positionEnde, int tmpSchiffnummer)//evtl. später noch durch differenzierte fehlermeldungen ersetzen
+bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, int tmpSchiffnummer)//evtl. später noch durch differenzierte fehlermeldungen ersetzen
 {
 	int tmpSchifflaenge = gesetzteSchiffe[tmpSchiffnummer]->holeSchifflaenge();
 	int *x= new int[tmpSchifflaenge];
@@ -57,24 +57,24 @@ bool SPIELFELD::setzeSchiff(int* positionAnfang, int* positionEnde, int tmpSchif
 
 	for(int i=0; i<2; i++)
 	{
-		if(positionAnfang[i]>9 || positionAnfang[i]<0 || positionEnde[i]>9 || positionEnde[i]<0) return false;
+                if(positionAnfang->holePosition(i)<0 || positionEnde->holePosition(i)<0) return false;
 	}
 	//überprüfen: passt die Länge, ist es eine reihe
 	//setze einzelne Positionen
-	if( (positionAnfang[0]==positionEnde[0] && betrag(positionAnfang[1]-positionEnde[1])+1==tmpSchifflaenge) )
+        if( (positionAnfang->holeX()==positionEnde->holeX() && betrag(positionAnfang->holeY()-positionEnde->holeY())+1==tmpSchifflaenge) )
 	{
 		for(int i=0; i<tmpSchifflaenge; i++)
 		{
-			x[i]=positionAnfang[0];
-			y[i]=kleineres(positionAnfang[1],positionEnde[1])+i;
+                        x[i]=positionAnfang->holeX();
+                        y[i]=kleineres(positionAnfang->holeY(),positionEnde->holeY())+i;
 		}
 	}
-	else if( (positionAnfang[1]==positionEnde[1] && betrag(positionAnfang[0]-positionEnde[0])+1==tmpSchifflaenge) )
+        else if( (positionAnfang->holeY()==positionEnde->holeY() && betrag(positionAnfang->holeX()-positionEnde->holeX())+1==tmpSchifflaenge) )
 	{
 		for(int i=0; i<tmpSchifflaenge; i++)
 		{
-			y[i]=positionAnfang[1];
-			x[i]=kleineres(positionAnfang[0],positionEnde[0])+i;
+                        y[i]=positionAnfang->holeY();
+                        x[i]=kleineres(positionAnfang->holeX(),positionEnde->holeX())+i;
 		}
 	}
 	else return false;
