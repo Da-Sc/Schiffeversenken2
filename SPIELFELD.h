@@ -29,7 +29,7 @@ class SPIELFELD
         EINZELNES_FELD* **Feld;//10x10 array wobei indizes die [x][y] koordinaten sind
         int AnzahlnochschwimmenderSchiffe;
         SCHIFF* *gesetzteSchiffe;
-		bool istdaeinSchiff(int*, int*, int);//true = Schiff auf einer der angegebenen Positionen
+        bool istdaeinSchiff(ERWEITERTE_POSITION* xy);//true = Schiff auf einer der angegebenen Positionen
 };
 
 #endif // SPIELFELD_H

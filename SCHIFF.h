@@ -3,6 +3,7 @@
 
 #include "SCHIFFLEIN.h"
 #include "SPIELFELD.h"
+#include "POSITION.h"
 
 class SCHIFFLEIN;
 class SPIELFELD;
@@ -15,7 +16,7 @@ class SCHIFF
         virtual ~SCHIFF();
         void legeSchifflaengefest(int);
         int holeSchifflaenge();
-        bool setzeaufSpielfeld(int*, int*);
+        bool setzeaufSpielfeld(ERWEITERTE_POSITION*);
         bool istVersenkt();
         void getroffen();
     protected:

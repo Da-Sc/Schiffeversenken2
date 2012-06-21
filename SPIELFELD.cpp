@@ -42,18 +42,21 @@ void SPIELFELD::legeSchifflaengefest(int tmpnummer, int tmplaenge)
     (gesetzteSchiffe[tmpnummer])->legeSchifflaengefest(tmplaenge);
 }
 
-bool SPIELFELD::istdaeinSchiff(int* x, int* y, int laengeArray)
+bool SPIELFELD::istdaeinSchiff(ERWEITERTE_POSITION* xy)
 {
-	for(int i=0; i<laengeArray;i++) if(Feld[x[i]][y[i]]->istSchiff())return true;
-	return false;
+        for(int i=0; i<xy->holeLaenge();i++)
+        {
+            if(xy->holeX(i)<0 || xy->holeY(i)<0) return true;
+            if(Feld[xy->holeX(i)][xy->holeY(i)]->istSchiff())return true;
+        }
+        return false;
 
 }
 
 bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, int tmpSchiffnummer)//evtl. später noch durch differenzierte fehlermeldungen ersetzen
 {
 	int tmpSchifflaenge = gesetzteSchiffe[tmpSchiffnummer]->holeSchifflaenge();
-	int *x= new int[tmpSchifflaenge];
-	int *y= new int[tmpSchifflaenge];
+        ERWEITERTE_POSITION *xy = new ERWEITERTE_POSITION(tmpSchifflaenge);
 
 	for(int i=0; i<2; i++)
 	{
@@ -65,25 +68,24 @@ bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, in
 	{
 		for(int i=0; i<tmpSchifflaenge; i++)
 		{
-                        x[i]=positionAnfang->holeX();
-                        y[i]=kleineres(positionAnfang->holeY(),positionEnde->holeY())+i;
+                        xy->setzePositionX(i,positionAnfang->holeX());
+                        xy->setzePositionY(i,kleineres(positionAnfang->holeY(),positionEnde->holeY())+i);
 		}
 	}
         else if( (positionAnfang->holeY()==positionEnde->holeY() && betrag(positionAnfang->holeX()-positionEnde->holeX())+1==tmpSchifflaenge) )
 	{
 		for(int i=0; i<tmpSchifflaenge; i++)
 		{
-                        y[i]=positionAnfang->holeY();
-                        x[i]=kleineres(positionAnfang->holeX(),positionEnde->holeX())+i;
+                        xy->setzePositionY(i,positionAnfang->holeY());
+                        xy->setzePositionX(i,kleineres(positionAnfang->holeX(),positionEnde->holeX())+i);
 		}
 	}
 	else return false;
 
-	if(istdaeinSchiff(x,y,tmpSchifflaenge)) return false;
-	if(!gesetzteSchiffe[tmpSchiffnummer]->setzeaufSpielfeld(x,y)) return false;
+        if(istdaeinSchiff(xy)) return false;
+        if(!gesetzteSchiffe[tmpSchiffnummer]->setzeaufSpielfeld(xy)) return false;
 
-	delete[] x;
-	delete[] y;
+        delete xy;
     return true;
 
 }

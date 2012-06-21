@@ -123,7 +123,6 @@ void SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
         auszugebendesSpielfeld[i]=0;
     }
     int tmpzaehler=0;
-    int allesoderallgemein=2;
 
     for(int zeile=9; zeile>=0; zeile--)
     {
@@ -191,6 +190,7 @@ void SPIEL::spielen(int anderreihe)
             BO_KOM::holeInstanz()->textAusgeben("\n\nSpieler",true);
             BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
             BO_KOM::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
+            zeigeSpielfelder(3);
             return;
         }
         BO_KOM::holeInstanz()->textAusgeben("Du bist ERNEUT an der Reihe! \n",true);

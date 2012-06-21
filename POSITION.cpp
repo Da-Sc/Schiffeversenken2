@@ -6,14 +6,6 @@ POSITION::POSITION()
     y=0;
 }
 
-bool POSITION::setzePosition(int tmpx, int tmpy)
-{
-    if(tmpx<0 || tmpx>9 || tmpy<0 || tmpy>9) return false;
-    x=tmpx;
-    y=tmpy;
-    return true;
-}
-
 bool POSITION::setzePositionX(int tmpx)
 {
     if(tmpx<0 || tmpx>9) return false;
@@ -43,4 +35,52 @@ int POSITION::holeX()
 int POSITION::holeY()
 {
     return y;
+}
+
+ERWEITERTE_POSITION::ERWEITERTE_POSITION(int tmplaenge)
+{
+    laenge=tmplaenge;
+    x=new int[laenge];
+    y=new int[laenge];
+    for(int i=0; i<laenge; i++)
+    {
+        x[i]=0;
+        y[i]=0;
+    }
+}
+ERWEITERTE_POSITION::~ERWEITERTE_POSITION()
+{
+    delete[] x;
+    delete[] y;
+}
+
+bool ERWEITERTE_POSITION::setzePositionX(int i, int tmpx)
+{
+    if(tmpx<0 || tmpx>9 || i<0 || i>=laenge) return false;
+    x[i]=tmpx;
+    return true;
+}
+
+bool ERWEITERTE_POSITION::setzePositionY(int i, int tmpy)
+{
+    if(tmpy<0 || tmpy>9 || i<0 || i>=laenge) return false;
+    y[i]=tmpy;
+    return true;
+}
+
+int ERWEITERTE_POSITION::holeX(int i)
+{
+    if(i<0 || i>=laenge)return -1;
+    return x[i];
+}
+
+int ERWEITERTE_POSITION::holeY(int i)
+{
+    if(i<0 || i>=laenge)return -1;
+    return y[i];
+}
+
+int ERWEITERTE_POSITION::holeLaenge()
+{
+    return laenge;
 }

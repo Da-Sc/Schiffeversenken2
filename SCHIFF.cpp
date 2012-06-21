@@ -42,13 +42,15 @@ int SCHIFF::holeSchifflaenge()
 	return Schifflaenge;
 }
 
-bool SCHIFF::setzeaufSpielfeld(int* x, int* y)
+bool SCHIFF::setzeaufSpielfeld(ERWEITERTE_POSITION* xy)
 {
-	for(int i=0; i<Schifflaenge; i++)
+    if(xy->holeLaenge()!=Schifflaenge)return false;
+    for(int i=0; i<Schifflaenge; i++)
     {
-        if(!aufFeld->ersetzedurchSchifflein(ausSchiffleinBestehend[i],x[i],y[i])) return false;
+        if(xy->holeX(i)<0 || xy->holeY(i)<0) return false;
+        if(!aufFeld->ersetzedurchSchifflein(ausSchiffleinBestehend[i],xy->holeX(i),xy->holeY(i))) return false;
     }
-	return true;
+    return true;
 }
 
 bool SCHIFF::istVersenkt()
