@@ -7,6 +7,8 @@ test = new KLASSE*[3]; -> default konstruktor muss vorhanden sein? laut christia
 for(i...) test[i]=new KLASSE(irgendwas, 123);
 */
 
+//netzwerk eventuell über SDL_net: http://content.gpwiki.org/index.php/SDL:Tutorial:Using_SDL_net
+
 //TESTS:
 #include "BO_KOM.h"
 #include <iostream>

@@ -191,6 +191,9 @@ void SPIEL::spielen(int anderreihe)
             BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
             BO_KOM::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
             zeigeSpielfelder(3);
+            BO_KOM::holeInstanz()->textAusgeben("\n\nSpieler",true);
+            BO_KOM::holeInstanz()->zahlAusgeben(anderreihe+1,true);
+            BO_KOM::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
             return;
         }
         BO_KOM::holeInstanz()->textAusgeben("Du bist ERNEUT an der Reihe! \n",true);

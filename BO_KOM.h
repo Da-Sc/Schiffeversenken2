@@ -25,12 +25,12 @@ class BO_KOM
         virtual void spielfeldAusgabe(char*);
     protected://private auch in vererbten aber trotzdem verfügbar
         BO_KOM();//damit genau eine Instanz von BO_KOM existiert: http://www.oop-trainer.de/Themen/Singleton.html
-    private:
-        void zahlAusgeben(int);
-        void textAusgeben(char*);//Ausgabe für 1PC Spiel
         static BO_KOM *instanz;
         bool zustand;//true = Alles OK, false = upps Fehler
         bool hinweisausgegeben;
+    private:
+        void zahlAusgeben(int);
+        void textAusgeben(char*);//Ausgabe für 1PC Spiel
 };
 
 #endif // BO_KOM_H

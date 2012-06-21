@@ -127,9 +127,15 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
 //Schiff: s
 //Schifftreffer: X
 //Schiffversenkt: V
-//Wasser oder unbekannt 0 (Zeichen!!!)
+//Wasser oder unbekannt: -
 //Wassertreffer: W
 {
+    char schiff = 's';
+    char schiffstreffer = 'X';
+    char schiffversenkt = 'V';
+    char unbekannt = '-';
+    char wassertreffer = 'W';
+
     if(tmpSpieler<0 || tmpSpieler>2 || tmpx>9 || tmpy>9 || tmpx<0 || tmpy<0) return 0;
 
     //alles ausgeben
@@ -143,17 +149,17 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
             {
                 if( ((Feld[tmpx][tmpy])->istVersenkt()) )
                 {
-                    return 'V';
+                    return schiffversenkt;
                 }
-                else{return 'X';}
+                else{return schiffstreffer;}
             }
-            else{return 's';}
+            else{return schiff;}
         }
         //->Wasser
         else
         {
-            if(((Feld[tmpx][tmpy])->istGetroffen())) return 'W';
-            return '0';
+            if(((Feld[tmpx][tmpy])->istGetroffen())) return wassertreffer;
+            return unbekannt;
         }
     }
     //nur was gegner bekannt
@@ -163,14 +169,14 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
         if( ((Feld[tmpx][tmpy])->istSchiff()) )
         {
             //getroffen?
-            if( ((Feld[tmpx][tmpy])->istGetroffen()) ) return 'X';
-            return '0';
+            if( ((Feld[tmpx][tmpy])->istGetroffen()) ) return schiffstreffer;
+            return unbekannt;
         }
         //->Wasser
         else
         {
-            if(((Feld[tmpx][tmpy])->istGetroffen())) return 'W';
-            return '0';
+            if(((Feld[tmpx][tmpy])->istGetroffen())) return wassertreffer;
+            return unbekannt;
         }
     }
 
