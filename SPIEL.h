@@ -2,7 +2,7 @@
 #define SPIEL_H
 
 #include "SPIELFELD.h"
-#include "BO_KOM.h"
+#include "BO_VERWALTUNG.h"
 #include "POSITION.h"
 
 class SPIEL

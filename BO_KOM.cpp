@@ -21,7 +21,7 @@ BO_KOM::~BO_KOM()
 {
     //dtor
 }
-
+/*
 BO_KOM *BO_KOM::instanz=NULL;
 
 BO_KOM* BO_KOM::holeInstanz()
@@ -30,7 +30,7 @@ BO_KOM* BO_KOM::holeInstanz()
       instanz=new BO_KOM();
 
     return instanz;
-}
+}*/
 
 void BO_KOM::textAusgeben(char* text)
 {

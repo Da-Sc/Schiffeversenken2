@@ -6,14 +6,15 @@
 #include <stdlib.h>
 #include "GLOBALEFUNKTIONEN.h"
 #include "POSITION.h"
+#include "BO.h"
 
 //Benutzeroberfläche Kommandozeile
-//benutzen mit: BO_KOM::holeInstanz()->
 
-class BO_KOM
+
+class BO_KOM : public BO
 {
     public:
-        static BO_KOM* holeInstanz();
+        BO_KOM();
         virtual ~BO_KOM();
         virtual void textAusgeben(char*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
         virtual void zahlAusgeben(int, bool);
@@ -23,11 +24,9 @@ class BO_KOM
         virtual void hinweis();
         virtual void konsoleLoeschen();
         virtual void spielfeldAusgabe(char*);
-    protected://private auch in vererbten aber trotzdem verfügbar
-        BO_KOM();//damit genau eine Instanz von BO_KOM existiert: http://www.oop-trainer.de/Themen/Singleton.html
-        static BO_KOM *instanz;
-        bool zustand;//true = Alles OK, false = upps Fehler
-        bool hinweisausgegeben;
+    protected:
+        //bool zustand;//true = Alles OK, false = upps Fehler
+        //bool hinweisausgegeben;
     private:
         void zahlAusgeben(int);
         void textAusgeben(char*);//Ausgabe für 1PC Spiel
