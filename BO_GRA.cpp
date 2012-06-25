@@ -5,25 +5,58 @@ BO_GRA::BO_GRA()
     zustand=true;
     hinweisausgegeben=false;
     fensterFarbtiefe=24;
-    fensterBreite=640;
-    fensterHoehe=480;
+    fensterBreite=1024;
+    fensterHoehe=512;
 
     unterstuetzendeKom = new BO_KOM();
 
-    // SDL initialisieren
-    SDL_Init(SDL_INIT_VIDEO);
+    //Initalisiere SDL
+    int testSDL_init=SDL_Init(SDL_INIT_VIDEO);
+    if (testSDL_init!=0)
+    {
+            std::cout << "Fehler bei Initalisieren von SDL." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
 
     // Zeichenfläche erstellen
     hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe, fensterFarbtiefe, SDL_SWSURFACE);
+    if (hintergrundFenster==0)
+    {
+            std::cout << "Fehler beim Erzeugen der Oberflche." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
 
+    SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
+
+    SDL_Surface* bildFelder=0;
+
+    //Hintergrund einfgen
+    bildFelder = SDL_LoadBMP("/home/ds/Dokumente/Schiffeversenken2/Schiffeversenken2/grafiken/schiffeversenken_2Felder.bmp");
+    if (bildFelder==0)
+    {
+            std::cout << "Grafik nicht verfuegbar." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
+    //kopiere Bild (auch surface) auf schon fertiges Fenster
+    SDL_BlitSurface(bildFelder,0,hintergrundFenster,0);
+    //nicht mehr benötigte Bild-surface löschen
+    SDL_FreeSurface(bildFelder);
+
+
+    /*
     // Die benötigte Farbe erstellen
     hintergrundFarbe = SDL_MapRGB(hintergrundFenster->format, 0, 0, 255);
 
     // Fülle Zeichenfläche mit Farbe
     SDL_FillRect(hintergrundFenster, 0, hintergrundFarbe);
+    */
 
     // Bildschirm Erneuern
     SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
+
 
 /*
     // SDL initialisieren
@@ -84,6 +117,10 @@ BO_GRA::BO_GRA()
 BO_GRA::~BO_GRA()
 {
     // SDL korrekt herunterfahren
+    if (hintergrundFenster!=NULL)
+    {
+            SDL_FreeSurface(hintergrundFenster);
+    }
     SDL_Quit();
 
     delete unterstuetzendeKom;
@@ -128,5 +165,7 @@ void BO_GRA::konsoleLoeschen()
 
 void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
 {
-    unterstuetzendeKom->spielfeldAusgabe(tmpFeldchar);
+    std::cout << "Hier sollte eine Ausgabe auftauchen" << std::endl;
+    SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
+    //unterstuetzendeKom->spielfeldAusgabe(tmpFeldchar);
 }

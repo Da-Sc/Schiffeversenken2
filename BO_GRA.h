@@ -4,6 +4,7 @@
 #include "BO.h"
 #include "BO_KOM.h"
 #include <SDL/SDL.h>
+//#include <SDL/SDL_image.h>
 #include <iostream>
 
 class BO_GRA : public BO
@@ -27,8 +28,9 @@ private:
     int fensterBreite;
     int fensterFarbtiefe;
     SDL_Surface* hintergrundFenster; //Fenster
-    Uint32 hintergrundFarbe; //Farbe
+    //Uint32 hintergrundFarbe; //Farbe
     SDL_Event ereignis; //event Container
+    //SDL_Surface* bildFelder; //Bild
     BO_KOM *unterstuetzendeKom;
 };
 
