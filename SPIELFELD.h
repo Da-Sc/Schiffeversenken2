@@ -21,6 +21,12 @@ class SPIELFELD
         bool ersetzedurchSchifflein(SCHIFFLEIN*,int, int);//x,y von 0 bis 9
         int Schuss(int,int);//Rückgabe: -1 Fehler; 0 Wasser; 1 Schiff; 2 versenkt
         void Schiffversenkt();
+        //Rückgabe array mit Identifikatoren Zeile für Zeile (Spieler1 Spieler2 Spieler1 ....)
+        //Schiff: s
+        //Schifftreffer: X
+        //Schiffversenkt: V
+        //Wasser oder unbekannt: -
+        //Wassertreffer: W
         char zeigeSpielfeldteilfuer(int, int, int);//int: für welchen Spieler ausgeben (0,1,2=einzelSpielerausgabe), int, int: x,y koordinate); Rückgabe: (später zu enum!, oder klasse)
         bool verloren();
     protected:

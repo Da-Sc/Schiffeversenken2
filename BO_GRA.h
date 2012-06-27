@@ -24,14 +24,21 @@ protected:
 private:
     //void zahlAusgeben(int);
     //void textAusgeben(char*);//Ausgabe für 1PC Spiel
+    int FeldNRHoeheinPixel(int);
+    int FeldNRBreiteinPixel(int,bool);
     int fensterHoehe;
     int fensterBreite;
     int fensterFarbtiefe;
+    double anteilSpielfeldHoehe;
+    double anteilSpielfeldBreite;
     SDL_Surface* hintergrundFenster; //Fenster
-    //Uint32 hintergrundFarbe; //Farbe
     SDL_Event ereignis; //event Container
-    //SDL_Surface* bildFelder; //Bild
     BO_KOM *unterstuetzendeKom;
+    //zum umrechnen
+    double anteilLinksfrei;
+    double anteilRechtsfrei;
+    double anteilObenfrei;
+    double anteilUntenfrei;
 };
 
 #endif // BO_GRA_H

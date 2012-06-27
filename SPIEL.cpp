@@ -194,6 +194,7 @@ void SPIEL::spielen(int anderreihe)
             BO_VERWALTUNG::holeInstanz()->textAusgeben("\n\nSpieler",true);
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,true);
             BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",true);
+            BO_VERWALTUNG::holeInstanz()->intErfragen();
             return;
         }
         BO_VERWALTUNG::holeInstanz()->textAusgeben("Du bist ERNEUT an der Reihe! \n",true);
