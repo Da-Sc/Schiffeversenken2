@@ -3,7 +3,7 @@
 #elif _WIN32
   #define KONSOLELOESCHEN "cls"
 #else
-  #define KONSOLELOESCHEN ""
+  #define KONSOLELOESCHEN "cls"
 #endif
 
 

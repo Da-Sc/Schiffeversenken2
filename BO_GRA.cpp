@@ -5,6 +5,8 @@ BO_GRA::BO_GRA()
 {
     zustand=true;
     hinweisausgegeben=false;
+    neumachen=false;
+
     fensterFarbtiefe=24;
     fensterBreite=1024;
     fensterHoehe=512;

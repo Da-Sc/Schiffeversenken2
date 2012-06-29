@@ -6,9 +6,9 @@
 class BO
 {
 public:
-    BO(){};
-    virtual ~BO(){};
-    virtual void textAusgeben(char*, bool)=0;//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
+    BO(){}
+    virtual ~BO(){}
+    virtual void textAusgeben(char*, bool)=0;//für BO_GRA: bool=true -> nächste ausgabe löscht vorheriges; inzwischen falsch: Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
     virtual void zahlAusgeben(int, bool)=0;
     virtual int intErfragen()=0;// am besten noch überladen, fürs netzwerk wenns wichtig wird wer gefragt wird!
     virtual bool positionErfragen(POSITION*)=0;

@@ -22,6 +22,7 @@ public:
     virtual void spielfeldAusgabe(char*);
 protected:
 private:
+    bool neumachen;
     //void zahlAusgeben(int);
     //void textAusgeben(char*);//Ausgabe für 1PC Spiel
     int FeldNRHoeheinPixel(int);
