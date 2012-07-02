@@ -1,11 +1,14 @@
 #include "BO_GRA.h"
 #include <cstring>
+#include <cmath>
 
 BO_GRA::BO_GRA()
 {
     zustand=true;
     hinweisausgegeben=false;
     neumachen=false;
+    gespeicherterChar=0;
+    laengegespeicherterChar=0;
 
     fensterFarbtiefe=24;
     fensterBreite=1024;
@@ -22,7 +25,7 @@ BO_GRA::BO_GRA()
     unterstuetzendeKom = new BO_KOM();
 
     //Initalisiere SDL
-    int testSDL_init=SDL_Init(SDL_INIT_VIDEO);
+    int testSDL_init=SDL_Init(SDL_INIT_EVERYTHING);//früher SDL_INIT_VIDEO
     if (testSDL_init!=0)
     {
             std::cout << "Fehler bei Initalisieren von SDL." << std::endl;
@@ -30,21 +33,34 @@ BO_GRA::BO_GRA()
             exit(-1);
     }
 
+    //Initialisiere Textausgabe
+    if(TTF_Init()==-1)
+    {
+        std::cout << "Fehler beim Starten der Textausgabe." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
     // Zeichenfläche erstellen
-    hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe, fensterFarbtiefe, SDL_SWSURFACE);
+    hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe+88, fensterFarbtiefe, SDL_SWSURFACE);
     if (hintergrundFenster==0)
     {
             std::cout << "Fehler beim Erzeugen der Oberflche." << std::endl;
             std::cin.get();
             exit(-1);
     }
+    // Die benötigte Farbe erstellen
+    farbe_weiss = SDL_MapRGB(hintergrundFenster->format, 255, 255, 255);
+
+    // Fülle Zeichenfläche mit Farbe
+    SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
 
     SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
 
     SDL_Surface* bildFelder=0;
 
     //Hintergrund einfgen
-    bildFelder = SDL_LoadBMP("/home/ds/Dokumente/Schiffeversenken2/Schiffeversenken2/grafiken/schiffeversenken_2Felder.bmp");
+    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
     if (bildFelder==0)
     {
             std::cout << "Grafik nicht verfuegbar." << std::endl;
@@ -57,6 +73,32 @@ BO_GRA::BO_GRA()
     SDL_BlitSurface(bildFelder,0,hintergrundFenster,0);
     //nicht mehr benötigte Bild-surface löschen
     SDL_FreeSurface(bildFelder);
+
+    schriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
+    if (schriftart==NULL)
+    {
+        std::cout << "Schrift konnte nicht geladen werden." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
+    //Ort wo Schrift hinkommen soll (3 Zeilen) (liegt auf dem bmp Bild unterhalb des Spielfeldes)
+    double dtmp;
+    for(int i=0; i<3; i++)
+    {
+        dtmp=((1-(anteilObenfrei+anteilSpielfeldHoehe))*fensterHoehe+88)/3.;
+        platzfuerSchrift[i].h=dtmp+1;
+        platzfuerSchrift[i].w=fensterBreite;
+        platzfuerSchrift[i].x=0;
+        platzfuerSchrift[i].y=i*(platzfuerSchrift[i].h)+(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe;
+        //std::cout << "Hoehe: " << dtmp << " breite: " << platzfuerSchrift[i].w << " x Pos: " << platzfuerSchrift[i].x << " y Pos: " << platzfuerSchrift[i].y << std::endl;
+    }
+    aktuelleZeile=0;
+    //Textfarbe
+    textfarbe.r=0;
+    textfarbe.g=0;
+    textfarbe.b=0;
+
 
     // Bildschirm Erneuern
     SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
@@ -129,24 +171,155 @@ BO_GRA::~BO_GRA()
 
     delete unterstuetzendeKom;
     unterstuetzendeKom=0;
+    delete[] gespeicherterChar;
+    gespeicherterChar=0;
 
 }
 
 void BO_GRA::textAusgeben(char* tmpchar, bool tmpbool)
 {
-    unterstuetzendeKom->textAusgeben(tmpchar, tmpbool);
+    //std::cout << "Ausgabe in Zeile: " << aktuelleZeile << std::endl;
+    //std::cout << "an die Position: " << (platzfuerSchrift[aktuelleZeile]).y << std::endl;
+    //std::cout << "tmpbool: " << tmpbool << " aktuelleZeile: " << aktuelleZeile << std::endl << tmpchar << std::endl;
+    SDL_FillRect(hintergrundFenster, &(platzfuerSchrift[aktuelleZeile]), farbe_weiss);
+    SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[aktuelleZeile]));
+
+    //sonst Speicherzugriffsfehler
+    int laengetmpchar=(int)strlen(tmpchar);
+    char *tmpchar2=new char[laengetmpchar];
+
+    for(int q=0; q<laengetmpchar; q++)
+    {
+        tmpchar2[q]=tmpchar[q];
+    }
+    //sonst Speicherzugriffsfehler
+
+    bool neueZeile=false;
+    for(int i=0; i<laengetmpchar; i++)
+    {
+        if(tmpchar2[i]=='\n')
+        {
+            neueZeile=true;
+            //std::cout << (int)strlen(tmpchar) << " : " << i << std::endl;
+            tmpchar2[i]=' ';//Speicherzugriffsfehler?!?
+        }
+    }
+
+    //durch vektor ersetzen
+    laengegespeicherterChar+=laengetmpchar;
+    char *altergespchar=gespeicherterChar;
+    gespeicherterChar = new char[laengegespeicherterChar];
+    for(int i=0; i<(laengegespeicherterChar-laengetmpchar); i++)
+    {
+        gespeicherterChar[i]=altergespchar[i];
+    }
+    delete[] altergespchar;
+    altergespchar=0;
+    int j=0;
+    for(int i=(laengegespeicherterChar-laengetmpchar); i<laengegespeicherterChar; i++)
+    {
+        j=i-(laengegespeicherterChar-laengetmpchar);
+        gespeicherterChar[i]=tmpchar2[j];
+    }
+
+    SDL_Surface* textoberflaeche=TTF_RenderText_Blended(schriftart,gespeicherterChar,textfarbe);
+    SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&(platzfuerSchrift[aktuelleZeile]));
+    SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[aktuelleZeile]));
+    SDL_FreeSurface(textoberflaeche);
+
+    if(neueZeile || tmpbool)
+    {
+        delete[] gespeicherterChar;
+        gespeicherterChar=0;
+        laengegespeicherterChar=0;
+    }
+
+    if(neueZeile) aktuelleZeile++;
+    if(aktuelleZeile>2)// || tmpbool
+    {
+        aktuelleZeile=0;
+        for(int j=0; j<0; j++)
+        {
+            SDL_FillRect(hintergrundFenster, &(platzfuerSchrift[j]), farbe_weiss);
+            SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[j]));
+        }
+    }
+    delete[] tmpchar2;
+    tmpchar2=0;
 }
 
 void BO_GRA::zahlAusgeben(int tmpzahl, bool tmpbool)
 {
-
-    unterstuetzendeKom->zahlAusgeben(tmpzahl, tmpbool);
+    if(tmpzahl<0) tmpzahl*=(-1);
+    int tmplaenge;
+    if(tmpzahl==0) tmplaenge=1;
+    else tmplaenge=(log10(tmpzahl)+1);
+    char *tmpchar=new char[tmplaenge+1];
+    tmpchar[tmplaenge]=0;
+    for(int i=tmplaenge-1; i>=0; i--)
+    {
+        tmpchar[i]=(tmpzahl%10)+48;
+        tmpzahl=tmpzahl/10;
+    }
+    //std::cout << "Test fuer zahlausgeben: " << tmpchar << std::endl;
+    this->textAusgeben(tmpchar, tmpbool);
+    delete[] tmpchar;
+    //unterstuetzendeKom->zahlAusgeben(tmpzahl, tmpbool);
 }
 
 int BO_GRA::intErfragen()
 {
-    return unterstuetzendeKom->intErfragen();
+    bool schleifeBeenden = false;
+    int tmprueckgabe=0;
+
+    SDL_Event ereignis; //event Container
+
+    while(!schleifeBeenden){
+        // auf nächstes Event warten
+        SDL_WaitEvent(&ereignis);
+        if(0 == SDL_WaitEvent(&ereignis))
+        {
+            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+            schleifeBeenden = true;
+            tmprueckgabe=-1;
+            break;
+        }
+        // Nun steckt in "event" ein Event
+        switch(ereignis.type)
+        {
+        case SDL_KEYDOWN:
+        {
+            int gedrueckteTaste=ereignis.key.keysym.sym;
+            if(gedrueckteTaste>=SDLK_0 && gedrueckteTaste<=SDLK_9)
+            {
+                tmprueckgabe=tmprueckgabe*10+(gedrueckteTaste - 48);
+            }
+            else if(gedrueckteTaste>=SDLK_KP0 && gedrueckteTaste<=SDLK_KP9)
+            {
+                tmprueckgabe=tmprueckgabe*10+(gedrueckteTaste - 256);
+            }
+            else if(gedrueckteTaste==SDLK_ESCAPE)
+            {
+                schleifeBeenden=true;
+                tmprueckgabe=-1;
+            }
+            else if(gedrueckteTaste==SDLK_RETURN || gedrueckteTaste==SDLK_KP_ENTER)
+            {
+                schleifeBeenden=true;
+            }
+        }
+            break;
+        case SDL_QUIT:
+            schleifeBeenden = true;
+            exit(-1);
+            break;
+        default:
+            break;
+        }
+    }
+    return tmprueckgabe;
 }
+
 
 bool BO_GRA::positionErfragen(POSITION* tmpposition)
 {
@@ -215,7 +388,7 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
     }
     TEST ende*/
 
-    char pfad[]="/home/ds/Dokumente/Schiffeversenken2/Schiffeversenken2/grafiken/W.bmp";
+    char pfad[]="grafiken/W.bmp";
 
     SDL_Rect position,index;
     position.x=0;
@@ -231,7 +404,7 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
         //entsprechendes Bild einsetzen
         if(tmpFeldchar[i]!='-')
         {
-            pfad[64]=tmpFeldchar[i];
+            pfad[9]=tmpFeldchar[i];
 
             SDL_Surface *einzelFeld = SDL_LoadBMP(pfad);
             if (einzelFeld==0)

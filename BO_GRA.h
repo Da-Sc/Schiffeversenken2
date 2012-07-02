@@ -4,8 +4,10 @@
 #include "BO.h"
 #include "BO_KOM.h"
 #include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 //#include <SDL/SDL_image.h>
 #include <iostream>
+#include "GLOBALEFUNKTIONEN.h"
 
 class BO_GRA : public BO
 {
@@ -33,8 +35,17 @@ private:
     double anteilSpielfeldHoehe;
     double anteilSpielfeldBreite;
     SDL_Surface* hintergrundFenster; //Fenster
-    SDL_Event ereignis; //event Container
+    Uint32 farbe_weiss;
     BO_KOM *unterstuetzendeKom;
+
+    //für Textausgabe:
+    TTF_Font* schriftart;//Font
+    SDL_Rect platzfuerSchrift[3];
+    int aktuelleZeile;
+    SDL_Color textfarbe;//Textfarbe
+    char *gespeicherterChar;
+    int laengegespeicherterChar;
+
     //zum umrechnen
     double anteilLinksfrei;
     double anteilRechtsfrei;

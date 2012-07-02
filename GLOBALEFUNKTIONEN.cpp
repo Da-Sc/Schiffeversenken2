@@ -17,3 +17,9 @@ int kleineres(int a, int b)
 	if(a<=b) return a;
 	return b;
 }
+//zu Template!!!
+int potenz(int x, int Potenz)
+{
+    if(Potenz==0) return 1;
+    return x*potenz(x,--Potenz);
+}
