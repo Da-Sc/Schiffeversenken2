@@ -10,11 +10,11 @@ SPIEL::SPIEL()
     BO_VERWALTUNG::holeInstanz()->textAusgeben("Neues Spiel gestartet\n",false);//beim Spiel ausgeben
     BO_VERWALTUNG::holeInstanz()->begruessung();
     //BO_VERWALTUNG::holeInstanz()->textAusgeben("\nAllgemeine Regeln vereinbaren:\n\n",true);
-    BO_VERWALTUNG::holeInstanz()->textAusgeben("Allgemeine Regeln vereinbaren:\n",false);
+    BO_VERWALTUNG::holeInstanz()->textAusgeben("Allgemeine Regeln vereinbaren\n",false);
 	do{
                 BO_VERWALTUNG::holeInstanz()->textAusgeben("Bitte die Anzahl an Schiffen (1-5) eingeben: ",true);//beim Spiel ausgeben
                 AnzahlSchiffe=BO_VERWALTUNG::holeInstanz()->intErfragen();
-                if(AnzahlSchiffe<1 || AnzahlSchiffe>5) BO_VERWALTUNG::holeInstanz()->textAusgeben("Ungültige Schiffanzahl!\n",true);//BO_VERWALTUNG::holeInstanz()->textAusgeben("Ungültige Schiffanzahl!\n\n",true);//beim Spiel ausgeben
+                if(AnzahlSchiffe<1 || AnzahlSchiffe>5) BO_VERWALTUNG::holeInstanz()->textAusgeben("Ungültige Schiffanzahl!\n",false);//BO_VERWALTUNG::holeInstanz()->textAusgeben("Ungültige Schiffanzahl!\n\n",true);//beim Spiel ausgeben
 	}while(AnzahlSchiffe<1 || AnzahlSchiffe>5);
 
 	//2 Spielfelder erzeugen
@@ -22,7 +22,7 @@ SPIEL::SPIEL()
 
 	//Schiffe anlegen
 	Schifflaenge = new int[AnzahlSchiffe];
-        BO_VERWALTUNG::holeInstanz()->textAusgeben("Und nun bitte die Länge (2-5 Felder) der einzelnen Schiffe:\n",true);//beim Spiel ausgeben
+    BO_VERWALTUNG::holeInstanz()->textAusgeben("Und nun bitte die Länge (2-5 Felder) der einzelnen Schiffe\n",false);//beim Spiel ausgeben
 	for(int i=0; i<AnzahlSchiffe; i++)
 	{
         BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff ",false);//beim Spiel ausgeben
@@ -34,7 +34,7 @@ SPIEL::SPIEL()
 
 		if(Laengetmp<2 || Laengetmp>5)
 		{
-                        BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff hat eine falsche Länge!\n",true);//beim Spiel ausgeben
+                        BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff hat eine falsche Länge!\n",false);//beim Spiel ausgeben
 			i--;
 		}
 		else
@@ -68,7 +68,7 @@ void SPIEL::setzeSchiffe(int Spieler)
         BO_VERWALTUNG::holeInstanz()->zahlAusgeben(i+1,false);
         BO_VERWALTUNG::holeInstanz()->textAusgeben(" (Länge: ",false);
         BO_VERWALTUNG::holeInstanz()->zahlAusgeben(Schifflaenge[i],false);
-        BO_VERWALTUNG::holeInstanz()->textAusgeben(") Anfang: ",true);
+        BO_VERWALTUNG::holeInstanz()->textAusgeben(") Anfang: ",false);
         if(!(BO_VERWALTUNG::holeInstanz()->positionErfragen(tmpPositionAnfang)))
         {
             BO_VERWALTUNG::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben.\n",false);
@@ -110,9 +110,9 @@ void SPIEL::setzeSchiffe(int Spieler)
                 BO_VERWALTUNG::holeInstanz()->textAusgeben("\n",false);*/
         //testausgaben
     }
-    BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler ",false);
+    /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler ",false);
     BO_VERWALTUNG::holeInstanz()->zahlAusgeben(Spieler+1,false);
-    BO_VERWALTUNG::holeInstanz()->textAusgeben(" fertig mit setzen seiner Schiffe.\n",true);
+    BO_VERWALTUNG::holeInstanz()->textAusgeben(" fertig mit setzen seiner Schiffe.\n",true);*/
     //nachfrage einbauen ob alles OK
     BO_VERWALTUNG::holeInstanz()->konsoleLoeschen();
 
@@ -170,7 +170,7 @@ void SPIEL::spielen(int anderreihe)
 
     BO_VERWALTUNG::holeInstanz()->textAusgeben("Schuss von SPIELER ",false);
     BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-    BO_VERWALTUNG::holeInstanz()->textAusgeben(" auf: ",false);
+    BO_VERWALTUNG::holeInstanz()->textAusgeben(" auf: ",true);
     BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition);
 
     ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
@@ -182,7 +182,7 @@ void SPIEL::spielen(int anderreihe)
         BO_VERWALTUNG::holeInstanz()->textAusgeben("Ausführung nicht möglich! Evtl. wurde dieses Feld bereits beschossen.\n",false);
         BO_VERWALTUNG::holeInstanz()->textAusgeben("SPIELER ",false);
         BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-        BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte widerholen: ",false);
+        BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte widerholen: ",true);
         BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition);
         ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
     }

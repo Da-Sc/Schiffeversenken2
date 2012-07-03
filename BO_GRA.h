@@ -41,6 +41,7 @@ private:
     //für Textausgabe:
     TTF_Font* schriftart;//Font
     SDL_Rect platzfuerSchrift[3];
+    SDL_Rect kompletterPlatzfuerSchrift;
     int aktuelleZeile;
     SDL_Color textfarbe;//Textfarbe
     char *gespeicherterChar;
@@ -51,6 +52,34 @@ private:
     double anteilRechtsfrei;
     double anteilObenfrei;
     double anteilUntenfrei;
+
+    //sonstiges
+    template <typename T>
+    int arrayvergroessern(T** pbasisarray, int laengebasis, T* zusatzarray, int laengezusatz)//gibt neue Länge zurück
+    {
+        T* basisarray;
+        basisarray=*pbasisarray;
+        laengebasis+=laengezusatz;
+        T *tmpbasisarray = new T[laengebasis+1];
+        if(basisarray!=0 && laengebasis!=0)
+        {
+            for(int i=0; i<(laengebasis-laengezusatz); i++)
+            {
+                tmpbasisarray[i]=basisarray[i];
+            }
+            delete[] basisarray;
+            basisarray=0;
+        }
+        int j=0;
+        for(int i=(laengebasis-laengezusatz); i<laengebasis; i++)
+        {
+            j=i-(laengebasis-laengezusatz);
+            tmpbasisarray[i]=zusatzarray[j];
+        }
+        tmpbasisarray[laengebasis]='\0';
+        *pbasisarray=tmpbasisarray;
+        return laengebasis;
+    }
 };
 
 #endif // BO_GRA_H

@@ -93,6 +93,11 @@ BO_GRA::BO_GRA()
         platzfuerSchrift[i].y=i*(platzfuerSchrift[i].h)+(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe;
         //std::cout << "Hoehe: " << dtmp << " breite: " << platzfuerSchrift[i].w << " x Pos: " << platzfuerSchrift[i].x << " y Pos: " << platzfuerSchrift[i].y << std::endl;
     }
+    kompletterPlatzfuerSchrift.x=0;
+    kompletterPlatzfuerSchrift.y=(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe;
+    kompletterPlatzfuerSchrift.h=((1-(anteilObenfrei+anteilSpielfeldHoehe))*fensterHoehe+88);
+    kompletterPlatzfuerSchrift.w=fensterBreite;
+
     aktuelleZeile=0;
     //Textfarbe
     textfarbe.r=0;
@@ -178,12 +183,19 @@ BO_GRA::~BO_GRA()
 
 void BO_GRA::textAusgeben(char* tmpchar, bool tmpbool)
 {
-    //std::cout << "Ausgabe in Zeile: " << aktuelleZeile << std::endl;
-    //std::cout << "an die Position: " << (platzfuerSchrift[aktuelleZeile]).y << std::endl;
-    //std::cout << "tmpbool: " << tmpbool << " aktuelleZeile: " << aktuelleZeile << std::endl << tmpchar << std::endl;
-    SDL_FillRect(hintergrundFenster, &(platzfuerSchrift[aktuelleZeile]), farbe_weiss);
-    SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[aktuelleZeile]));
+    if(neumachen)
+    {
+        aktuelleZeile=0;
+        SDL_FillRect(hintergrundFenster, &kompletterPlatzfuerSchrift, farbe_weiss);
+        SDL_UpdateRects(hintergrundFenster,1,&kompletterPlatzfuerSchrift);
+    }
+    else
+    {
+        SDL_FillRect(hintergrundFenster, &(platzfuerSchrift[aktuelleZeile]), farbe_weiss);
+        SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[aktuelleZeile]));
+    }
 
+    neumachen=false;
     //sonst Speicherzugriffsfehler
     int laengetmpchar=(int)strlen(tmpchar);
     char *tmpchar2=new char[laengetmpchar];
@@ -200,28 +212,15 @@ void BO_GRA::textAusgeben(char* tmpchar, bool tmpbool)
         if(tmpchar2[i]=='\n')
         {
             neueZeile=true;
-            //std::cout << (int)strlen(tmpchar) << " : " << i << std::endl;
             tmpchar2[i]=' ';//Speicherzugriffsfehler?!?
         }
     }
 
-    //durch vektor ersetzen
-    laengegespeicherterChar+=laengetmpchar;
-    char *altergespchar=gespeicherterChar;
-    gespeicherterChar = new char[laengegespeicherterChar];
-    for(int i=0; i<(laengegespeicherterChar-laengetmpchar); i++)
-    {
-        gespeicherterChar[i]=altergespchar[i];
-    }
-    delete[] altergespchar;
-    altergespchar=0;
-    int j=0;
-    for(int i=(laengegespeicherterChar-laengetmpchar); i<laengegespeicherterChar; i++)
-    {
-        j=i-(laengegespeicherterChar-laengetmpchar);
-        gespeicherterChar[i]=tmpchar2[j];
-    }
+    //durch vektor ersetzen?
+    //allgemein char -> string!!!
+    laengegespeicherterChar=arrayvergroessern<char>(&gespeicherterChar, laengegespeicherterChar, tmpchar2, laengetmpchar);
 
+    //std::cout << "gespeicherterChar: " << gespeicherterChar << std::endl;
     SDL_Surface* textoberflaeche=TTF_RenderText_Blended(schriftart,gespeicherterChar,textfarbe);
     SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&(platzfuerSchrift[aktuelleZeile]));
     SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[aktuelleZeile]));
@@ -232,17 +231,12 @@ void BO_GRA::textAusgeben(char* tmpchar, bool tmpbool)
         delete[] gespeicherterChar;
         gespeicherterChar=0;
         laengegespeicherterChar=0;
+        aktuelleZeile++;
     }
 
-    if(neueZeile) aktuelleZeile++;
-    if(aktuelleZeile>2)// || tmpbool
+    if(aktuelleZeile>2 || tmpbool)
     {
-        aktuelleZeile=0;
-        for(int j=0; j<0; j++)
-        {
-            SDL_FillRect(hintergrundFenster, &(platzfuerSchrift[j]), farbe_weiss);
-            SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[j]));
-        }
+        neumachen=true;
     }
     delete[] tmpchar2;
     tmpchar2=0;
@@ -253,14 +247,16 @@ void BO_GRA::zahlAusgeben(int tmpzahl, bool tmpbool)
     if(tmpzahl<0) tmpzahl*=(-1);
     int tmplaenge;
     if(tmpzahl==0) tmplaenge=1;
-    else tmplaenge=(log10(tmpzahl)+1);
+    else tmplaenge=(int)(log10(tmpzahl)+1);
+
     char *tmpchar=new char[tmplaenge+1];
-    tmpchar[tmplaenge]=0;
-    for(int i=tmplaenge-1; i>=0; i--)
+
+    for(int i=(tmplaenge-1); i>=0; i--)
     {
         tmpchar[i]=(tmpzahl%10)+48;
         tmpzahl=tmpzahl/10;
     }
+    tmpchar[tmplaenge]=0;
     //std::cout << "Test fuer zahlausgeben: " << tmpchar << std::endl;
     this->textAusgeben(tmpchar, tmpbool);
     delete[] tmpchar;
