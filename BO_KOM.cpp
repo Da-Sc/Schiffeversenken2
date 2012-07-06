@@ -32,12 +32,12 @@ BO_KOM* BO_KOM::holeInstanz()
     return instanz;
 }*/
 
-void BO_KOM::textAusgeben(char* text)
+void BO_KOM::textAusgeben(char const* text)
 {
     std::cout << text << std::flush;
 }
 
-void BO_KOM::textAusgeben(char* text, bool)
+void BO_KOM::textAusgeben(char const* text, bool)
 {
     textAusgeben(text);
 }
@@ -74,7 +74,7 @@ int BO_KOM::intErfragen()
 
 bool BO_KOM::positionErfragen(POSITION* position,int)
 {
-    positionErfragen(position);
+    return positionErfragen(position);
 }
 
 bool BO_KOM::positionErfragen(POSITION* position)

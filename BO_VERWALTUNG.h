@@ -10,6 +10,7 @@
 class BO_VERWALTUNG
 {
 public:
+    ~BO_VERWALTUNG();
     static BO* holeInstanz();
     static void setzeModus(int);
 private:

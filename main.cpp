@@ -28,5 +28,6 @@ int main()
 
     EinPC_Spiel->spielen(-1);
 
+    delete EinPC_Spiel;
     return 0;
 }

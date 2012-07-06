@@ -211,7 +211,8 @@ void SPIEL::spielen(int anderreihe)
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
             BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);*/
             BO_VERWALTUNG::holeInstanz()->gewinnerAusgeben(anderreihe);
-            BO_VERWALTUNG::holeInstanz()->intErfragen();
+            //BO_VERWALTUNG::holeInstanz()->intErfragen();
+            delete BO_VERWALTUNG::holeInstanz();
             return;
         }
         BO_VERWALTUNG::holeInstanz()->textAusgeben("Du bist ERNEUT an der Reihe! \n",false);

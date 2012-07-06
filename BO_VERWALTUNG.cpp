@@ -9,6 +9,12 @@ BO_VERWALTUNG::BO_VERWALTUNG()
     modus=0;
 }
 
+BO_VERWALTUNG::~BO_VERWALTUNG()
+{
+    delete BOinstanz;
+    BOinstanz=0;
+}
+
 BO* BO_VERWALTUNG::holeInstanz()
 {
   if( VERWinstanz == 0 )

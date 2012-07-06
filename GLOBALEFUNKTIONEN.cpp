@@ -7,11 +7,13 @@ int buchstabeZuArrayposition(char buchst)
 	return tmp;
 }
 
+/*
 int betrag(int zahl)
 {
 	if(zahl >= 0) return zahl;
 	return zahl*(-1);
-}
+}*/
+
 int kleineres(int a, int b)
 {
 	if(a<=b) return a;

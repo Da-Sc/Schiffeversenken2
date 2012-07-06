@@ -14,7 +14,7 @@ class BO_GRA : public BO
 public:
     BO_GRA();
     virtual ~BO_GRA();
-    virtual void textAusgeben(char*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
+    virtual void textAusgeben(char const*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
     virtual void zahlAusgeben(int, bool);
     virtual int intErfragen();// am besten noch überladen, fürs netzwerk wenns wichtig wird wer gefragt wird!
     virtual bool positionErfragen(POSITION*, int);
@@ -28,9 +28,10 @@ public:
     virtual void ausgabeVersenkt(){}
 protected:
 private:
-    bool neumachen;
-    //void zahlAusgeben(int);
-    //void textAusgeben(char*);//Ausgabe für 1PC Spiel
+    void erneuereGraphischeOberflaeche();
+    void warten(bool);
+
+    //Umrechnung von Feldindizes zu Pixelkoordinaten und umgekehrt
     int FeldNRHoeheinPixel(int);
     int FeldNRBreiteinPixel(int,bool);
     int pixelPositionzuFeldNrX(double, bool);
@@ -43,9 +44,19 @@ private:
     double anteilSpielfeldBreite;
     SDL_Surface* hintergrundFenster; //Fenster
     Uint32 farbe_weiss;
-    BO_KOM *unterstuetzendeKom;
+    //einzelne Felder
+    SDL_Surface *einzelFeldWasser;
+    SDL_Surface *einzelFeldSchiff;
+    SDL_Surface *einzelFeldVersenkt;
+    SDL_Surface *einzelFeldTreffer;
+
+    //zum erneuern der oberflaeche
+    char *letzteSpielfeldausgabe;
+    //abfangen von doppelten ereignissen, da muastaste gedrückt und hoch dasselbe auslösen (->nur so aktzeptable sensitivität)
+    int altPixelX,altPixelY;
 
     //für Textausgabe:
+    bool neumachen;
     TTF_Font* schriftart;//Font
     SDL_Rect platzfuerSchrift[3];
     SDL_Rect kompletterPlatzfuerSchrift;

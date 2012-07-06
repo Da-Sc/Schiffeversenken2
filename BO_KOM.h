@@ -16,7 +16,7 @@ class BO_KOM : public BO
     public:
         BO_KOM();
         virtual ~BO_KOM();
-        virtual void textAusgeben(char*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
+        virtual void textAusgeben(char const*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
         virtual void zahlAusgeben(int, bool);
         virtual int intErfragen();// am besten noch überladen, fürs netzwerk wenns wichtig wird wer gefragt wird!
         virtual bool positionErfragen(POSITION*,int);
@@ -33,7 +33,7 @@ class BO_KOM : public BO
         //bool hinweisausgegeben;
     private:
         void zahlAusgeben(int);
-        void textAusgeben(char*);//Ausgabe für 1PC Spiel
+        void textAusgeben(char const*);//Ausgabe für 1PC Spiel
         virtual bool positionErfragen(POSITION*);
 };
 

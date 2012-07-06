@@ -1,5 +1,6 @@
+#include <ctime>
 #include "BO_GRA.h"
-#include <cstring>
+//#include <cstring>
 #include <cmath>
 //allgemein mehr funktionen wie Gewinner ausgeben, spieler an der reihe etc., sodass die einzelnen bos besser angepasst werden können!
 BO_GRA::BO_GRA()
@@ -9,6 +10,10 @@ BO_GRA::BO_GRA()
     neumachen=false;
     gespeicherterChar=0;
     laengegespeicherterChar=0;
+
+    letzteSpielfeldausgabe = 0;
+    altPixelX=-1;
+    altPixelY=-1;
 
     fensterFarbtiefe=24;
     fensterBreite=1024;
@@ -22,7 +27,7 @@ BO_GRA::BO_GRA()
     anteilSpielfeldHoehe=(462.-43.)/512.;
     anteilSpielfeldBreite=(469.-47.)/1024.;
 
-    unterstuetzendeKom = new BO_KOM();
+    //unterstuetzendeKom = new BO_KOM();
 
     //Initalisiere SDL
     int testSDL_init=SDL_Init(SDL_INIT_EVERYTHING);//früher SDL_INIT_VIDEO
@@ -52,10 +57,12 @@ BO_GRA::BO_GRA()
     // Die benötigte Farbe erstellen
     farbe_weiss = SDL_MapRGB(hintergrundFenster->format, 255, 255, 255);
 
+    SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
+
+    erneuereGraphischeOberflaeche();
+    /*jetzt in funktion setzeG...
     // Fülle Zeichenfläche mit Farbe
     SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
-
-    SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
 
     SDL_Surface* bildFelder=0;
 
@@ -73,7 +80,7 @@ BO_GRA::BO_GRA()
     SDL_BlitSurface(bildFelder,0,hintergrundFenster,0);
     //nicht mehr benötigte Bild-surface löschen
     SDL_FreeSurface(bildFelder);
-
+    */
     schriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
     if (schriftart==NULL)
     {
@@ -109,9 +116,35 @@ BO_GRA::BO_GRA()
     eingabenPlatz.w=100;
     eingabenPlatz.h=60;
 
-    // Bildschirm Erneuern
-    SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
+    // Bildschirm Erneuern, jetzt in funktion setzeG...
+    //SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
 
+
+    //Figuren laden:
+    char pfadWasser[]="grafiken/W.bmp";
+    char pfadSchiff[]="grafiken/s.bmp";
+    char pfadVersenkt[]="grafiken/V.bmp";
+    char pfadTreffer[]="grafiken/X.bmp";
+
+    //Wasser
+    einzelFeldWasser = SDL_LoadBMP(pfadWasser);
+    einzelFeldSchiff = SDL_LoadBMP(pfadSchiff);
+    einzelFeldVersenkt = SDL_LoadBMP(pfadVersenkt);
+    einzelFeldTreffer = SDL_LoadBMP(pfadTreffer);
+    if (!einzelFeldWasser || !einzelFeldSchiff || !einzelFeldTreffer || !einzelFeldVersenkt)
+    {
+        std::cout << "Eine der Einzelnen Feld Grafiken ist nicht verfuegbar." << std::endl;
+        warten(false);
+        exit(-1);
+    }
+    einzelFeldWasser->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
+    einzelFeldWasser->w=anteilSpielfeldBreite/10.*fensterBreite-2;
+    einzelFeldSchiff->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
+    einzelFeldSchiff->w=anteilSpielfeldBreite/10.*fensterBreite-2;
+    einzelFeldVersenkt->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
+    einzelFeldVersenkt->w=anteilSpielfeldBreite/10.*fensterBreite-2;
+    einzelFeldTreffer->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
+    einzelFeldTreffer->w=anteilSpielfeldBreite/10.*fensterBreite-2;
 
 /*
     // SDL initialisieren
@@ -176,16 +209,36 @@ BO_GRA::~BO_GRA()
     {
             SDL_FreeSurface(hintergrundFenster);
     }
+    if (einzelFeldWasser!=NULL)
+    {
+            SDL_FreeSurface(einzelFeldWasser);
+    }
+    if (einzelFeldSchiff!=NULL)
+    {
+            SDL_FreeSurface(einzelFeldSchiff);
+    }
+    if (einzelFeldVersenkt!=NULL)
+    {
+            SDL_FreeSurface(einzelFeldVersenkt);
+    }
+    if (einzelFeldTreffer!=NULL)
+    {
+            SDL_FreeSurface(einzelFeldTreffer);
+    }
     SDL_Quit();
 
-    delete unterstuetzendeKom;
-    unterstuetzendeKom=0;
     delete[] gespeicherterChar;
     gespeicherterChar=0;
 
+    if(letzteSpielfeldausgabe!=0)
+    {
+        delete[] letzteSpielfeldausgabe;
+        letzteSpielfeldausgabe=0;
+    }
+
 }
 
-void BO_GRA::textAusgeben(char* tmpchar, bool tmpbool)
+void BO_GRA::textAusgeben(char const* tmpchar, bool tmpbool)
 {
     if(neumachen)
     {
@@ -358,7 +411,7 @@ int BO_GRA::intErfragen()
 bool BO_GRA::positionErfragen(POSITION* tmpposition, int tmpSpieler)
 {
     bool schleifeBeenden = false;
-    //int tmpx=0,tmpy=0;
+    int tmpX,tmpY;
 
     SDL_Event ereignis; //event Container
     while(!schleifeBeenden)
@@ -370,27 +423,23 @@ bool BO_GRA::positionErfragen(POSITION* tmpposition, int tmpSpieler)
             schleifeBeenden = true;
             break;
         }
-        //std::cout << "Ereignis!!!" << std::flush;
+        //std::cout << "an event: " << std::clock() << " : " << (int)ereignis.type << std::endl;
         switch(ereignis.type)
         {
-        /*case SDL_MOUSEBUTTONUP:
-            std::cout << std::endl << "Button: " << ereignis.button.button << " Maustaste Oben!!!" << std::endl;
-            //break;*/
+        case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
-            //std::cout << std::endl << "Button: " << ereignis.button.button << " Maustaste Unten!!!" << std::endl;
-            if(ereignis.button.button == SDL_BUTTON_LEFT)
+            tmpX=ereignis.button.x;
+            tmpY=ereignis.button.y;
+            //wurde die maus seit dem letzten maustasten ereignis bewegt?
+            if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
             {
-                //std::cout << "[ " << ereignis.button.x << " | " << ereignis.button.y << " ]" << std::endl;
-                //std::cout << "[ " << pixelPositionzuFeldNrX(ereignis.button.x) << " | " << pixelPositionzuFeldNrY(ereignis.button.y) << " ]" << std::endl;
-                //SDL_GetMouseState(&tmpx,&tmpy);
-            if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(ereignis.button.x,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(ereignis.button.y)))
-            //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpx,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpy)))
-            {
-                schleifeBeenden=true;
-                //std::cout << "Schleife sollte beendet werden!" << std::endl;
+                if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
+                {
+                    schleifeBeenden=true;
+                }
             }
-            //else std::cout << "Problem :( " << std::endl;
-            }
+            altPixelX=tmpX;
+            altPixelY=tmpY;
             break;
         case SDL_QUIT:
             schleifeBeenden = true;
@@ -401,22 +450,135 @@ bool BO_GRA::positionErfragen(POSITION* tmpposition, int tmpSpieler)
         }
     }
     return true;
-    //return unterstuetzendeKom->positionErfragen(tmpposition);
+}
+
+void BO_GRA::warten(bool erneuern)
+{
+    bool schleifeBeenden=false;
+    SDL_Event ereignis; //event Container
+    while(!schleifeBeenden)
+    {
+        SDL_WaitEvent(&ereignis);
+        if(0 == SDL_WaitEvent(&ereignis))
+        {
+            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+            schleifeBeenden = true;
+            break;
+        }
+        if(ereignis.type==SDL_KEYDOWN || ereignis.type==SDL_MOUSEBUTTONUP)
+        {
+            schleifeBeenden=true;
+        }
+        if(ereignis.type==SDL_QUIT)
+        {
+            schleifeBeenden = true;
+            exit(-1);
+        }
+    }
+    if(erneuern) erneuereGraphischeOberflaeche();
 }
 
 void BO_GRA::begruessung()
 {
-    unterstuetzendeKom->begruessung();
+    SDL_Rect mittenaufFenster[5];
+    for(int i=0;i<5;i++)
+    {
+        mittenaufFenster[i].h=50;
+        mittenaufFenster[i].w=300;
+        mittenaufFenster[i].x=fensterBreite/2-2.5/2.*mittenaufFenster[i].w;
+        mittenaufFenster[i].y=fensterHoehe/2-mittenaufFenster[i].h/2;
+    }
+    mittenaufFenster[0].y-=100;
+    mittenaufFenster[1].y-=50;
+    mittenaufFenster[2].y+=0;
+    mittenaufFenster[3].y+=50;
+    mittenaufFenster[4].y+=100;
+
+    char const *begruessung[5];
+    begruessung[0]="Willkommen zu einer Partie Schiffeversenken.";
+    begruessung[1]="Da diese Partie an einem PC stattfindet,";
+    //begruessung[2]="ist es unumgänglich fair zu spielen";
+    begruessung[2]="ist es unumgaenglich fair zu spielen";
+    //begruessung[3]="und während der Gegner seine Schiffe setzt wegzuschauen!";
+    begruessung[3]="und waehrend der Gegner seine Schiffe setzt wegzuschauen!";
+    //begruessung[4]="Viel Spaß!";
+    begruessung[4]="Viel Spass!";
+
+    TTF_Font *begrSchriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
+    if (begrSchriftart==NULL)
+    {
+        std::cout << "Schrift konnte nicht geladen werden." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
+    SDL_Surface* textoberflaeche;
+
+    for(int i=0; i<5;i++)
+    {
+        textoberflaeche=TTF_RenderText_Blended(begrSchriftart,begruessung[i],textfarbe);
+        SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&mittenaufFenster[i]);
+    }
+
+
+    SDL_UpdateRects(hintergrundFenster,5,mittenaufFenster);
+    SDL_FreeSurface(textoberflaeche);
+
+    warten(true);
 }
 
 void BO_GRA::hinweis()
 {
-    unterstuetzendeKom->hinweis();
+    if(!hinweisausgegeben)
+    {
+        hinweisausgegeben=true;
+        SDL_Rect mittenaufFenster[3];
+        for(int i=0;i<3;i++)
+        {
+            mittenaufFenster[i].h=50;
+            mittenaufFenster[i].w=300;
+            mittenaufFenster[i].x=fensterBreite/2-2.7/2.*mittenaufFenster[i].w;
+            mittenaufFenster[i].y=fensterHoehe/2-mittenaufFenster[i].h/2;
+        }
+        mittenaufFenster[0].y-=50;
+        mittenaufFenster[1].y+=0;
+        mittenaufFenster[2].y+=50;
+
+        char const *begruessung[3];
+        begruessung[0]="Nun können die Schiffe einzeln gesetzt werden.";
+        begruessung[1]="Das Terminal wird nach erfolgter Eingabe eines Spielers geloescht.";
+        begruessung[2]="Bitte schaut weg, wenn euer Gegner seine Schiffe setzt!";
+
+        TTF_Font *hinwSchriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
+        if (hinwSchriftart==NULL)
+        {
+            std::cout << "Schrift konnte nicht geladen werden." << std::endl;
+            std::cin.get();
+            exit(-1);
+        }
+
+        SDL_Surface* textoberflaeche;
+
+        for(int i=0; i<3;i++)
+        {
+            textoberflaeche=TTF_RenderText_Blended(hinwSchriftart,begruessung[i],textfarbe);
+            SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&mittenaufFenster[i]);
+        }
+
+
+        SDL_UpdateRects(hintergrundFenster,3,mittenaufFenster);
+        SDL_FreeSurface(textoberflaeche);
+
+        warten(true);
+    }
 }
 
 void BO_GRA::konsoleLoeschen()
 {
-    unterstuetzendeKom->konsoleLoeschen();
+    eingabenPlatz.w=100;
+    eingabenPlatz.h=60;
+    SDL_FillRect(hintergrundFenster, &eingabenPlatz, farbe_weiss);
+    SDL_UpdateRects(hintergrundFenster,1,&eingabenPlatz);
 }
 
 void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
@@ -428,6 +590,8 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
         std::cin.get();
         exit(-1);
     }
+    if(letzteSpielfeldausgabe==0)letzteSpielfeldausgabe = new char[200];
+    kopiereArray<char>(tmpFeldchar,letzteSpielfeldausgabe,200);
 
     /*TEST der Feldgröße
     SDL_Rect Feldbereich;
@@ -466,8 +630,9 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
     }
     TEST ende*/
 
-    char pfad[]="grafiken/W.bmp";
+    //char pfad[]="grafiken/W.bmp";
 
+    SDL_Surface *einzelFeld;
     SDL_Rect position,index;
     position.x=0;
     position.y=0;
@@ -482,8 +647,26 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
         //entsprechendes Bild einsetzen
         if(tmpFeldchar[i]!='-')
         {
-            pfad[9]=tmpFeldchar[i];
+            switch(tmpFeldchar[i])
+            {
+            case 's':
+                einzelFeld=einzelFeldSchiff;
+                break;
+            case 'V':
+                einzelFeld=einzelFeldVersenkt;
+                break;
+            case 'W':
+                einzelFeld=einzelFeldWasser;
+                break;
+            case 'X':
+                einzelFeld=einzelFeldTreffer;
+                break;
+            default:
+                einzelFeld=einzelFeldWasser;
+                break;
+            }
 
+            /*pfad[9]=tmpFeldchar[i];
             SDL_Surface *einzelFeld = SDL_LoadBMP(pfad);
             if (einzelFeld==0)
             {
@@ -494,13 +677,15 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
             }
             einzelFeld->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
             einzelFeld->w=anteilSpielfeldBreite/10.*fensterBreite-2;
+            */
             position.h=einzelFeld->h;
             position.w=einzelFeld->w;
             SDL_BlitSurface(einzelFeld,0,hintergrundFenster,&position);
-            SDL_FreeSurface(einzelFeld);
+            einzelFeld=0;
 
             //SDL_Flip(hintergrundFenster);
-            SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
+            //SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
+            SDL_UpdateRects(hintergrundFenster,1,&position);
         }
         //position auf Feld bestimmen
         if((i+1)%10==0)
@@ -517,7 +702,7 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
     }
 
 
-    SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
+    //SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
     //unterstuetzendeKom->spielfeldAusgabe(tmpFeldchar);
 }
 
@@ -600,4 +785,32 @@ void BO_GRA::gewinnerAusgeben(int tmpGewinner)
     SDL_FreeSurface(textoberflaeche);
 
     delete[] gewinnerChar;
+
+    warten(false);
+}
+
+void BO_GRA::erneuereGraphischeOberflaeche()
+{
+    // Fülle Zeichenfläche mit Farbe
+    SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
+
+    SDL_Surface* bildFelder=0;
+    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
+    if (bildFelder==0)
+    {
+            std::cout << "Grafik nicht verfuegbar." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
+    bildFelder->h=fensterHoehe;
+    bildFelder->w=fensterBreite;
+    //kopiere Bild (auch surface) auf schon fertiges Fenster
+    SDL_BlitSurface(bildFelder,0,hintergrundFenster,0);
+    //nicht mehr benötigte Bild-surface löschen
+    SDL_FreeSurface(bildFelder);
+
+    if(letzteSpielfeldausgabe!=0) spielfeldAusgabe(letzteSpielfeldausgabe);
+    aktuelleZeile=0;
+
+    SDL_UpdateRect(hintergrundFenster,0,0,0,0);
 }
