@@ -220,7 +220,7 @@ void BO_GRA::zahlAusgeben(int tmpzahl, bool tmpbool)
     if(tmpzahl<0) tmpzahl*=(-1);
     int tmplaenge;
     if(tmpzahl==0) tmplaenge=1;
-    else tmplaenge=(int)(log10(tmpzahl)+1);
+    else tmplaenge=(int)(log10((double)tmpzahl)+1);
 
     char *tmpchar=new char[tmplaenge+1];
 
@@ -499,10 +499,11 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
     {
         std::cout << "Internes Problem, Program wird beendet" << std::endl;
         std::cin.get();
-        exit(-1);
+        exit(-2);
     }
-    if(letzteSpielfeldausgabe==0)letzteSpielfeldausgabe = new char[200];
+    if(letzteSpielfeldausgabe==0)letzteSpielfeldausgabe = new char[201];
     kopiereArray<char>(tmpFeldchar,letzteSpielfeldausgabe,200);
+	letzteSpielfeldausgabe[200]=0;
 
     SDL_Surface *einzelFeld;
     SDL_Rect position,index;
@@ -566,16 +567,16 @@ int BO_GRA::FeldNRBreiteinPixel(int feldnr, bool rechts)
 
     if(rechts)
     {
-        return (2*anteilLinksfrei+anteilRechtsfrei+anteilSpielfeldBreite+feldnr*feldgroesseB)*fensterBreite;
+        return (int)((2*anteilLinksfrei+anteilRechtsfrei+anteilSpielfeldBreite+feldnr*feldgroesseB)*fensterBreite);
     }
-    return (anteilLinksfrei+feldnr*feldgroesseB)*fensterBreite;
+    return (int)((anteilLinksfrei+feldnr*feldgroesseB)*fensterBreite);
 }
 
 int BO_GRA::FeldNRHoeheinPixel(int feldnr)
 {
     double feldgroesseH=anteilSpielfeldHoehe/10.;
 
-    return (anteilObenfrei+feldnr*feldgroesseH)*fensterHoehe;
+    return (int)((anteilObenfrei+feldnr*feldgroesseH)*fensterHoehe);
 }
 
 int BO_GRA::pixelPositionzuFeldNrX(double pixelX, bool rechts)
@@ -666,4 +667,34 @@ void BO_GRA::erneuereGraphischeOberflaeche()
     aktuelleZeile=0;
 
     SDL_UpdateRect(hintergrundFenster,0,0,0,0);
+}
+void BO_GRA::ausgabeVersenkt()
+{
+	SDL_Rect mittenaufFenster;
+    mittenaufFenster.h=150;
+    mittenaufFenster.w=300;
+    mittenaufFenster.x=fensterBreite/2-mittenaufFenster.w;
+    mittenaufFenster.y=fensterHoehe/2-mittenaufFenster.h/2;
+
+    char versenktChar[]="Schiff Versenkt!";
+
+    SDL_Color farbe_dunkelrot;
+    farbe_dunkelrot.r=200;
+    farbe_dunkelrot.b=0;
+    farbe_dunkelrot.g=0;
+
+    TTF_Font *gewinnerSchriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",36);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
+    if (gewinnerSchriftart==NULL)
+    {
+        std::cout << "Schrift konnte nicht geladen werden." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
+    SDL_Surface* textoberflaeche=TTF_RenderText_Blended(gewinnerSchriftart,versenktChar,farbe_dunkelrot);
+    SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&mittenaufFenster);
+    SDL_UpdateRects(hintergrundFenster,1,&mittenaufFenster);
+    SDL_FreeSurface(textoberflaeche);
+
+    warten(true);
 }

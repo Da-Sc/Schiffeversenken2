@@ -4,6 +4,7 @@
 #include "BO.h"
 #include "BO_KOM.h"
 #include <SDL/SDL.h>
+//#include <SDL.h>
 #include <SDL/SDL_ttf.h>
 //#include <SDL/SDL_image.h>
 #include <iostream>
@@ -25,7 +26,7 @@ public:
     virtual void gewinnerAusgeben(int);
     virtual void ausgabeWasser(){}
     virtual void ausgabeTreffer(){}
-    virtual void ausgabeVersenkt(){}
+    virtual void ausgabeVersenkt();
 protected:
 private:
     void erneuereGraphischeOberflaeche();

@@ -11,7 +11,7 @@ for(i...) test[i]=new KLASSE(irgendwas, 123);
 //netzwerk eventuell über SDL_net: http://content.gpwiki.org/index.php/SDL:Tutorial:Using_SDL_net
 
 
-int main()
+int main(int argc, char* argv[])
 {
     BO_VERWALTUNG::setzeModus(1);
 
