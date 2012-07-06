@@ -1,6 +1,5 @@
 #include <ctime>
 #include "BO_GRA.h"
-//#include <cstring>
 #include <cmath>
 //allgemein mehr funktionen wie Gewinner ausgeben, spieler an der reihe etc., sodass die einzelnen bos besser angepasst werden können!
 BO_GRA::BO_GRA()
@@ -27,10 +26,8 @@ BO_GRA::BO_GRA()
     anteilSpielfeldHoehe=(462.-43.)/512.;
     anteilSpielfeldBreite=(469.-47.)/1024.;
 
-    //unterstuetzendeKom = new BO_KOM();
-
     //Initalisiere SDL
-    int testSDL_init=SDL_Init(SDL_INIT_EVERYTHING);//früher SDL_INIT_VIDEO
+    int testSDL_init=SDL_Init(SDL_INIT_EVERYTHING);
     if (testSDL_init!=0)
     {
             std::cout << "Fehler bei Initalisieren von SDL." << std::endl;
@@ -60,27 +57,7 @@ BO_GRA::BO_GRA()
     SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
 
     erneuereGraphischeOberflaeche();
-    /*jetzt in funktion setzeG...
-    // Fülle Zeichenfläche mit Farbe
-    SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
 
-    SDL_Surface* bildFelder=0;
-
-    //Hintergrund einfgen
-    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
-    if (bildFelder==0)
-    {
-            std::cout << "Grafik nicht verfuegbar." << std::endl;
-            std::cin.get();
-            exit(-1);
-    }
-    bildFelder->h=fensterHoehe;
-    bildFelder->w=fensterBreite;
-    //kopiere Bild (auch surface) auf schon fertiges Fenster
-    SDL_BlitSurface(bildFelder,0,hintergrundFenster,0);
-    //nicht mehr benötigte Bild-surface löschen
-    SDL_FreeSurface(bildFelder);
-    */
     schriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
     if (schriftart==NULL)
     {
@@ -98,7 +75,6 @@ BO_GRA::BO_GRA()
         platzfuerSchrift[i].w=fensterBreite;
         platzfuerSchrift[i].x=0;
         platzfuerSchrift[i].y=i*(platzfuerSchrift[i].h)+(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe;
-        //std::cout << "Hoehe: " << dtmp << " breite: " << platzfuerSchrift[i].w << " x Pos: " << platzfuerSchrift[i].x << " y Pos: " << platzfuerSchrift[i].y << std::endl;
     }
     kompletterPlatzfuerSchrift.x=0;
     kompletterPlatzfuerSchrift.y=(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe;
@@ -115,10 +91,6 @@ BO_GRA::BO_GRA()
     eingabenPlatz.y=(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe+platzfuerSchrift[0].h;
     eingabenPlatz.w=100;
     eingabenPlatz.h=60;
-
-    // Bildschirm Erneuern, jetzt in funktion setzeG...
-    //SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
-
 
     //Figuren laden:
     char pfadWasser[]="grafiken/W.bmp";
@@ -145,61 +117,6 @@ BO_GRA::BO_GRA()
     einzelFeldVersenkt->w=anteilSpielfeldBreite/10.*fensterBreite-2;
     einzelFeldTreffer->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
     einzelFeldTreffer->w=anteilSpielfeldBreite/10.*fensterBreite-2;
-
-/*
-    // SDL initialisieren
-      SDL_Init(SDL_INIT_VIDEO);
-
-      // Unsere Zeichenfläche erstellen
-      SDL_Surface* screen = SDL_SetVideoMode(640, 480, 24, SDL_SWSURFACE);
-
-      // Die benötigte Farbe erstellen
-      Uint32 color_red = SDL_MapRGB(screen->format, 255, 0, 0);
-
-      // Fülle Zeichenfläche mit Farbe
-      SDL_FillRect(screen, NULL, color_red);
-
-      // Bildschirm Updaten
-      SDL_UpdateRect(screen, 0, 0, 0, 0);
-
-
-      // Event-Container
-      SDL_Event event;
-
-      // Event loop
-      bool exitLoop = false;
-      while(!exitLoop){
-
-        // auf nächstes Event warten
-        SDL_WaitEvent(&event);
-        // Nun steckt in "event" ein Event
-
-        switch(event.type)
-        {
-          case SDL_KEYDOWN:
-            std::cout << "mod: " << event.key.keysym.mod
-                 << "; scancode: " << (int)event.key.keysym.scancode
-                 << "; sym: " << event.key.keysym.sym
-                 << "; unicode: " << event.key.keysym.unicode
-                 << std::endl;
-            if(event.key.keysym.sym==SDLK_ESCAPE)
-              exitLoop=true;
-            break;
-          case SDL_QUIT:
-            exitLoop = true;
-            break;
-          default:
-            break;
-        }
-
-
-      }
-
-      //cout << "Press return to exit" << endl;
-      //cin.get();
-
-      // SDL korrekt herunterfahren
-      SDL_Quit();*/
 }
 
 BO_GRA::~BO_GRA()
@@ -277,7 +194,6 @@ void BO_GRA::textAusgeben(char const* tmpchar, bool tmpbool)
     //allgemein char -> string!!!
     laengegespeicherterChar=arrayvergroessern<char>(&gespeicherterChar, laengegespeicherterChar, tmpchar2, laengetmpchar);
 
-    //std::cout << "gespeicherterChar: " << gespeicherterChar << std::endl;
     SDL_Surface* textoberflaeche=TTF_RenderText_Blended(schriftart,gespeicherterChar,textfarbe);
     SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&(platzfuerSchrift[aktuelleZeile]));
     SDL_UpdateRects(hintergrundFenster,1,&(platzfuerSchrift[aktuelleZeile]));
@@ -314,10 +230,9 @@ void BO_GRA::zahlAusgeben(int tmpzahl, bool tmpbool)
         tmpzahl=tmpzahl/10;
     }
     tmpchar[tmplaenge]=0;
-    //std::cout << "Test fuer zahlausgeben: " << tmpchar << std::endl;
+
     this->textAusgeben(tmpchar, tmpbool);
     delete[] tmpchar;
-    //unterstuetzendeKom->zahlAusgeben(tmpzahl, tmpbool);
 }
 
 int BO_GRA::intErfragen()
@@ -497,11 +412,8 @@ void BO_GRA::begruessung()
     char const *begruessung[5];
     begruessung[0]="Willkommen zu einer Partie Schiffeversenken.";
     begruessung[1]="Da diese Partie an einem PC stattfindet,";
-    //begruessung[2]="ist es unumgänglich fair zu spielen";
     begruessung[2]="ist es unumgaenglich fair zu spielen";
-    //begruessung[3]="und während der Gegner seine Schiffe setzt wegzuschauen!";
     begruessung[3]="und waehrend der Gegner seine Schiffe setzt wegzuschauen!";
-    //begruessung[4]="Viel Spaß!";
     begruessung[4]="Viel Spass!";
 
     TTF_Font *begrSchriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
@@ -545,7 +457,7 @@ void BO_GRA::hinweis()
         mittenaufFenster[2].y+=50;
 
         char const *begruessung[3];
-        begruessung[0]="Nun können die Schiffe einzeln gesetzt werden.";
+        begruessung[0]="Nun koennen die Schiffe einzeln gesetzt werden.";
         begruessung[1]="Das Terminal wird nach erfolgter Eingabe eines Spielers geloescht.";
         begruessung[2]="Bitte schaut weg, wenn euer Gegner seine Schiffe setzt!";
 
@@ -583,7 +495,6 @@ void BO_GRA::konsoleLoeschen()
 
 void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
 {
-    //std::cout << "Hier sollte eine Ausgabe auftauchen: " << strlen(tmpFeldchar) << std::endl;
     if(strlen(tmpFeldchar)!=200)
     {
         std::cout << "Internes Problem, Program wird beendet" << std::endl;
@@ -592,45 +503,6 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
     }
     if(letzteSpielfeldausgabe==0)letzteSpielfeldausgabe = new char[200];
     kopiereArray<char>(tmpFeldchar,letzteSpielfeldausgabe,200);
-
-    /*TEST der Feldgröße
-    SDL_Rect Feldbereich;
-    Feldbereich.h=anteilSpielfeldHoehe*fensterHoehe;
-    Feldbereich.w=anteilSpielfeldBreite*fensterBreite;
-    Feldbereich.x=anteilLinksfrei*fensterBreite;
-    Feldbereich.y=anteilObenfrei*fensterHoehe;
-    SDL_Rect Feldbereich2;
-    Feldbereich2.h=anteilSpielfeldHoehe*fensterHoehe;
-    Feldbereich2.w=anteilSpielfeldBreite*fensterBreite;
-    Feldbereich2.x=(2*anteilLinksfrei+anteilRechtsfrei+anteilSpielfeldBreite)*fensterBreite;
-    Feldbereich2.y=anteilObenfrei*fensterHoehe;
-    Uint32 color_red = SDL_MapRGB(hintergrundFenster->format, 255, 0, 0);
-    SDL_FillRect(hintergrundFenster, &Feldbereich, color_red);
-    SDL_FillRect(hintergrundFenster, &Feldbereich2, color_red);
-    ENDE TEST der Feldgröße*/
-
-    /*TEST der einzelnen Felder
-    SDL_Rect einzelFeldbereich;
-    einzelFeldbereich.h=anteilSpielfeldHoehe/10.*fensterHoehe;
-    einzelFeldbereich.w=anteilSpielfeldBreite/10.*fensterBreite;
-
-    Uint32 color_red = SDL_MapRGB(hintergrundFenster->format, 255, 0, 0);
-    for(int i=0;i<10;i++)
-    {
-        for(int j=0;j<10;j++)
-        {
-            einzelFeldbereich.x=FeldNRBreiteinPixel(i,false);
-            einzelFeldbereich.y=FeldNRHoeheinPixel(j);
-            SDL_FillRect(hintergrundFenster, &einzelFeldbereich, color_red);
-
-            einzelFeldbereich.x=FeldNRBreiteinPixel(i,true);
-            einzelFeldbereich.y=FeldNRHoeheinPixel(j);
-            SDL_FillRect(hintergrundFenster, &einzelFeldbereich, color_red);
-        }
-    }
-    TEST ende*/
-
-    //char pfad[]="grafiken/W.bmp";
 
     SDL_Surface *einzelFeld;
     SDL_Rect position,index;
@@ -665,26 +537,11 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
                 einzelFeld=einzelFeldWasser;
                 break;
             }
-
-            /*pfad[9]=tmpFeldchar[i];
-            SDL_Surface *einzelFeld = SDL_LoadBMP(pfad);
-            if (einzelFeld==0)
-            {
-                    std::cout << "Grafik nicht verfuegbar." << std::endl;
-                    std::cout << pfad << std::endl;
-                    std::cin.get();
-                    exit(-1);
-            }
-            einzelFeld->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
-            einzelFeld->w=anteilSpielfeldBreite/10.*fensterBreite-2;
-            */
             position.h=einzelFeld->h;
             position.w=einzelFeld->w;
             SDL_BlitSurface(einzelFeld,0,hintergrundFenster,&position);
             einzelFeld=0;
 
-            //SDL_Flip(hintergrundFenster);
-            //SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
             SDL_UpdateRects(hintergrundFenster,1,&position);
         }
         //position auf Feld bestimmen
@@ -700,10 +557,6 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
         }
         else index.x++;
     }
-
-
-    //SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
-    //unterstuetzendeKom->spielfeldAusgabe(tmpFeldchar);
 }
 
 //feldnr von 0 bis 9!
