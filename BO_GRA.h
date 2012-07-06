@@ -17,11 +17,15 @@ public:
     virtual void textAusgeben(char*, bool);//Auswahl Ausgabe an eigenen oder alle PCs (im 1PC-Spiel wird das ohne bool aufgerufen)
     virtual void zahlAusgeben(int, bool);
     virtual int intErfragen();// am besten noch überladen, fürs netzwerk wenns wichtig wird wer gefragt wird!
-    virtual bool positionErfragen(POSITION*);
+    virtual bool positionErfragen(POSITION*, int);
     virtual void begruessung();
     virtual void hinweis();
     virtual void konsoleLoeschen();
     virtual void spielfeldAusgabe(char*);
+    virtual void gewinnerAusgeben(int);
+    virtual void ausgabeWasser(){}
+    virtual void ausgabeTreffer(){}
+    virtual void ausgabeVersenkt(){}
 protected:
 private:
     bool neumachen;
@@ -29,6 +33,9 @@ private:
     //void textAusgeben(char*);//Ausgabe für 1PC Spiel
     int FeldNRHoeheinPixel(int);
     int FeldNRBreiteinPixel(int,bool);
+    int pixelPositionzuFeldNrX(double, bool);
+    int pixelPositionzuFeldNrY(double);
+
     int fensterHoehe;
     int fensterBreite;
     int fensterFarbtiefe;
@@ -42,6 +49,7 @@ private:
     TTF_Font* schriftart;//Font
     SDL_Rect platzfuerSchrift[3];
     SDL_Rect kompletterPlatzfuerSchrift;
+    SDL_Rect eingabenPlatz;
     int aktuelleZeile;
     SDL_Color textfarbe;//Textfarbe
     char *gespeicherterChar;

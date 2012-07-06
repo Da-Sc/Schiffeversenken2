@@ -69,7 +69,7 @@ void SPIEL::setzeSchiffe(int Spieler)
         BO_VERWALTUNG::holeInstanz()->textAusgeben(" (Länge: ",false);
         BO_VERWALTUNG::holeInstanz()->zahlAusgeben(Schifflaenge[i],false);
         BO_VERWALTUNG::holeInstanz()->textAusgeben(") Anfang: ",false);
-        if(!(BO_VERWALTUNG::holeInstanz()->positionErfragen(tmpPositionAnfang)))
+        if(!(BO_VERWALTUNG::holeInstanz()->positionErfragen(tmpPositionAnfang,Spieler)))
         {
             BO_VERWALTUNG::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben.\n",false);
             i--;
@@ -79,7 +79,7 @@ void SPIEL::setzeSchiffe(int Spieler)
             BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff ",false);
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(i+1,false);
             BO_VERWALTUNG::holeInstanz()->textAusgeben(" Ende: ",true);
-            if(!(BO_VERWALTUNG::holeInstanz()->positionErfragen(tmpPositionEnde)))
+            if(!(BO_VERWALTUNG::holeInstanz()->positionErfragen(tmpPositionEnde,Spieler)))
             {
                 BO_VERWALTUNG::holeInstanz()->textAusgeben("ungültige Position, bitte erneut eingeben.\n",false);
                 i--;
@@ -171,7 +171,7 @@ void SPIEL::spielen(int anderreihe)
     BO_VERWALTUNG::holeInstanz()->textAusgeben("Schuss von SPIELER ",false);
     BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
     BO_VERWALTUNG::holeInstanz()->textAusgeben(" auf: ",true);
-    BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition);
+    BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition,(anderreihe+1)%2);
 
     ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
     if(ergebnis<-1 || ergebnis>2) return;
@@ -183,33 +183,34 @@ void SPIEL::spielen(int anderreihe)
         BO_VERWALTUNG::holeInstanz()->textAusgeben("SPIELER ",false);
         BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
         BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte widerholen: ",true);
-        BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition);
+        BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition, (anderreihe+1)%2);
         ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
     }
 
     //Wasser
     if(ergebnis==0)
     {
-        BO_VERWALTUNG::holeInstanz()->textAusgeben("--- WASSER --- :( \n",false);
+        BO_VERWALTUNG::holeInstanz()->ausgabeWasser();//textAusgeben("--- WASSER --- :( \n",false);
         spielen((anderreihe+1)%2);
     }
 
     //Schiff
     if(ergebnis>0)
     {
-        BO_VERWALTUNG::holeInstanz()->textAusgeben("=== TREFFER ! === :) \n",false);
-        if(ergebnis==2) BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff VERSENKT ;) \n",false);
+        BO_VERWALTUNG::holeInstanz()->ausgabeTreffer(); //textAusgeben("=== TREFFER ! === :) \n",false);
+        if(ergebnis==2) BO_VERWALTUNG::holeInstanz()->ausgabeVersenkt(); //textAusgeben("Schiff VERSENKT ;) \n",false);
         if(Meer[(anderreihe+1)%2]->verloren())
         {
             //BO_VERWALTUNG::holeInstanz()->textAusgeben("\n\nSpieler",false);
-            BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler",false);
+            /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler",false);
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-            BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);
+            BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);*/
             zeigeSpielfelder(3);
             //BO_VERWALTUNG::holeInstanz()->textAusgeben("\n\nSpieler",false);
-            BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler",false);
+            /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler",false);
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-            BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);
+            BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);*/
+            BO_VERWALTUNG::holeInstanz()->gewinnerAusgeben(anderreihe);
             BO_VERWALTUNG::holeInstanz()->intErfragen();
             return;
         }

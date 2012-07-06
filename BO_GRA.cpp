@@ -1,7 +1,7 @@
 #include "BO_GRA.h"
 #include <cstring>
 #include <cmath>
-
+//allgemein mehr funktionen wie Gewinner ausgeben, spieler an der reihe etc., sodass die einzelnen bos besser angepasst werden können!
 BO_GRA::BO_GRA()
 {
     zustand=true;
@@ -104,6 +104,10 @@ BO_GRA::BO_GRA()
     textfarbe.g=0;
     textfarbe.b=0;
 
+    eingabenPlatz.x=fensterBreite-100;
+    eingabenPlatz.y=(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe+platzfuerSchrift[0].h;
+    eingabenPlatz.w=100;
+    eingabenPlatz.h=60;
 
     // Bildschirm Erneuern
     SDL_UpdateRect(hintergrundFenster, 0, 0, 0, 0);
@@ -268,6 +272,15 @@ int BO_GRA::intErfragen()
     bool schleifeBeenden = false;
     int tmprueckgabe=0;
 
+    char eingabenAusgabe[10+1];
+    int eingabeZiffer;
+
+    for(int i=0; i<10+1; i++)
+    {
+        eingabenAusgabe[i]=0;
+    }
+    eingabeZiffer=0;
+
     SDL_Event ereignis; //event Container
 
     while(!schleifeBeenden){
@@ -280,7 +293,8 @@ int BO_GRA::intErfragen()
             tmprueckgabe=-1;
             break;
         }
-        // Nun steckt in "event" ein Event
+        if(eingabeZiffer>10) eingabeZiffer=0;//segFault verhindern (unschön, sollte aber reichen)
+        // Nun steckt in "ereignis" ein Event
         switch(ereignis.type)
         {
         case SDL_KEYDOWN:
@@ -289,15 +303,28 @@ int BO_GRA::intErfragen()
             if(gedrueckteTaste>=SDLK_0 && gedrueckteTaste<=SDLK_9)
             {
                 tmprueckgabe=tmprueckgabe*10+(gedrueckteTaste - 48);
+                eingabenAusgabe[eingabeZiffer]=gedrueckteTaste;
+                eingabeZiffer++;
             }
             else if(gedrueckteTaste>=SDLK_KP0 && gedrueckteTaste<=SDLK_KP9)
             {
                 tmprueckgabe=tmprueckgabe*10+(gedrueckteTaste - 256);
+                eingabenAusgabe[eingabeZiffer]=gedrueckteTaste-(256-48);
+                eingabeZiffer++;
             }
             else if(gedrueckteTaste==SDLK_ESCAPE)
             {
                 schleifeBeenden=true;
                 tmprueckgabe=-1;
+            }
+            else if(gedrueckteTaste==SDLK_BACKSPACE)
+            {
+                if(eingabeZiffer>0)
+                {
+                    eingabeZiffer--;
+                    eingabenAusgabe[eingabeZiffer]=0;
+                    tmprueckgabe=tmprueckgabe/10;
+                }
             }
             else if(gedrueckteTaste==SDLK_RETURN || gedrueckteTaste==SDLK_KP_ENTER)
             {
@@ -312,14 +339,69 @@ int BO_GRA::intErfragen()
         default:
             break;
         }
+        //eingabe Feld frei machen
+        eingabenPlatz.w=100;
+        eingabenPlatz.h=60;
+        SDL_FillRect(hintergrundFenster, &eingabenPlatz, farbe_weiss);
+        SDL_UpdateRects(hintergrundFenster,1,&eingabenPlatz);
+
+        //neue Eingabe rendern und darstellen
+        SDL_Surface* textoberflaeche=TTF_RenderText_Blended(schriftart,eingabenAusgabe,textfarbe);
+        SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&eingabenPlatz);
+        SDL_UpdateRects(hintergrundFenster,1,&eingabenPlatz);
+        SDL_FreeSurface(textoberflaeche);
     }
     return tmprueckgabe;
 }
 
 
-bool BO_GRA::positionErfragen(POSITION* tmpposition)
+bool BO_GRA::positionErfragen(POSITION* tmpposition, int tmpSpieler)
 {
-    return unterstuetzendeKom->positionErfragen(tmpposition);
+    bool schleifeBeenden = false;
+    //int tmpx=0,tmpy=0;
+
+    SDL_Event ereignis; //event Container
+    while(!schleifeBeenden)
+    {
+        SDL_WaitEvent(&ereignis);
+        if(0 == SDL_WaitEvent(&ereignis))
+        {
+            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+            schleifeBeenden = true;
+            break;
+        }
+        //std::cout << "Ereignis!!!" << std::flush;
+        switch(ereignis.type)
+        {
+        /*case SDL_MOUSEBUTTONUP:
+            std::cout << std::endl << "Button: " << ereignis.button.button << " Maustaste Oben!!!" << std::endl;
+            //break;*/
+        case SDL_MOUSEBUTTONDOWN:
+            //std::cout << std::endl << "Button: " << ereignis.button.button << " Maustaste Unten!!!" << std::endl;
+            if(ereignis.button.button == SDL_BUTTON_LEFT)
+            {
+                //std::cout << "[ " << ereignis.button.x << " | " << ereignis.button.y << " ]" << std::endl;
+                //std::cout << "[ " << pixelPositionzuFeldNrX(ereignis.button.x) << " | " << pixelPositionzuFeldNrY(ereignis.button.y) << " ]" << std::endl;
+                //SDL_GetMouseState(&tmpx,&tmpy);
+            if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(ereignis.button.x,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(ereignis.button.y)))
+            //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpx,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpy)))
+            {
+                schleifeBeenden=true;
+                //std::cout << "Schleife sollte beendet werden!" << std::endl;
+            }
+            //else std::cout << "Problem :( " << std::endl;
+            }
+            break;
+        case SDL_QUIT:
+            schleifeBeenden = true;
+            exit(-1);
+            break;
+        default:
+            break;
+        }
+    }
+    return true;
+    //return unterstuetzendeKom->positionErfragen(tmpposition);
 }
 
 void BO_GRA::begruessung()
@@ -456,4 +538,66 @@ int BO_GRA::FeldNRHoeheinPixel(int feldnr)
     double feldgroesseH=anteilSpielfeldHoehe/10.;
 
     return (anteilObenfrei+feldnr*feldgroesseH)*fensterHoehe;
+}
+
+int BO_GRA::pixelPositionzuFeldNrX(double pixelX, bool rechts)
+{
+    double tmprueckgabe=-1;
+    if(rechts) tmprueckgabe=((pixelX/fensterBreite)-(2*anteilLinksfrei+anteilRechtsfrei+anteilSpielfeldBreite))*10./anteilSpielfeldBreite;
+    else tmprueckgabe=(pixelX/fensterBreite-anteilLinksfrei)*10./anteilSpielfeldBreite;
+    if(tmprueckgabe>10 || tmprueckgabe<0) return -1;
+    return (int)(tmprueckgabe);
+}
+int BO_GRA::pixelPositionzuFeldNrY(double pixelY)
+{
+    double tmprueckgabe=(pixelY/fensterHoehe-anteilObenfrei)*10./anteilSpielfeldHoehe;
+    if(tmprueckgabe>10 || tmprueckgabe<0) return -1;
+    return 9-(int)(tmprueckgabe);
+}
+
+void BO_GRA::gewinnerAusgeben(int tmpGewinner)
+{
+    if(tmpGewinner>1 || tmpGewinner<0) return;
+    SDL_Rect mittenaufFenster;
+    mittenaufFenster.h=150;
+    mittenaufFenster.w=300;
+    mittenaufFenster.x=fensterBreite/2-mittenaufFenster.w;
+    mittenaufFenster.y=fensterHoehe/2-mittenaufFenster.h/2;
+
+    char gewinnerChar1[]="Spieler ";
+    int l1=8;//ohne 0, der wird später eingefügt;
+    int l3=14;
+    char gewinnerChar3[]=" hat Gewonnen!";
+    char *gewinnerChar=new char[23+1];
+
+    for(int i=0; i<l1; i++)
+    {
+        gewinnerChar[i]=gewinnerChar1[i];
+    }
+    gewinnerChar[l1]=tmpGewinner+1+48;
+    for(int i=0; i<l3; i++)
+    {
+        gewinnerChar[i+l1+1]=gewinnerChar3[i];
+    }
+    gewinnerChar[l1+1+l3]=0;
+
+    SDL_Color farbe_rot;
+    farbe_rot.r=255;
+    farbe_rot.b=0;
+    farbe_rot.g=0;
+
+    TTF_Font *gewinnerSchriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",48);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
+    if (gewinnerSchriftart==NULL)
+    {
+        std::cout << "Schrift konnte nicht geladen werden." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
+    SDL_Surface* textoberflaeche=TTF_RenderText_Blended(gewinnerSchriftart,gewinnerChar,farbe_rot);
+    SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&mittenaufFenster);
+    SDL_UpdateRects(hintergrundFenster,1,&mittenaufFenster);
+    SDL_FreeSurface(textoberflaeche);
+
+    delete[] gewinnerChar;
 }

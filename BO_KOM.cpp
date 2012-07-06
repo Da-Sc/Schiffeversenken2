@@ -72,6 +72,11 @@ int BO_KOM::intErfragen()
     return tmp;
 }
 
+bool BO_KOM::positionErfragen(POSITION* position,int)
+{
+    positionErfragen(position);
+}
+
 bool BO_KOM::positionErfragen(POSITION* position)
 {
         char tmpc[4];
@@ -205,4 +210,26 @@ void BO_KOM::spielfeldAusgabe(char* grundlageninfos)
     }
 
     textAusgeben(auszugebendesSpielfeld,true);
+}
+
+void BO_KOM::gewinnerAusgeben(int tmpGewinner)
+{
+    textAusgeben("\nSpieler ");
+    zahlAusgeben(tmpGewinner+1);
+    textAusgeben(" hat Gewonnen!\n");
+}
+
+void BO_KOM::ausgabeWasser()
+{
+    textAusgeben("\n--- WASSER --- :( \n\n");
+}
+
+void BO_KOM::ausgabeTreffer()
+{
+    textAusgeben("\n=== TREFFER ! === :) \n\n");
+}
+
+void BO_KOM::ausgabeVersenkt()
+{
+    textAusgeben("Schiff VERSENKT ;) \n");
 }
