@@ -28,6 +28,7 @@ class BO_KOM : public BO
         virtual void ausgabeWasser();
         virtual void ausgabeTreffer();
         virtual void ausgabeVersenkt();
+        virtual void spieleranderReihe(int, bool);
     protected:
         //bool zustand;//true = Alles OK, false = upps Fehler
         //bool hinweisausgegeben;

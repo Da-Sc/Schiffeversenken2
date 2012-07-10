@@ -233,3 +233,18 @@ void BO_KOM::ausgabeVersenkt()
 {
     textAusgeben("Schiff VERSENKT ;) \n");
 }
+void BO_KOM::spieleranderReihe(int tmpSpieler, bool wiederholung)
+{
+    if(!wiederholung)
+    {
+        textAusgeben("\nSchuss von SPIELER ");
+        zahlAusgeben(tmpSpieler+1);
+        textAusgeben(" auf: ");
+    }
+    else
+    {
+        textAusgeben("\nSPIELER ");
+        zahlAusgeben(tmpSpieler+1);
+        textAusgeben(" bitte Wiederholen: ");
+    }
+}

@@ -20,6 +20,7 @@ public:
     virtual void ausgabeWasser()=0;
     virtual void ausgabeTreffer()=0;
     virtual void ausgabeVersenkt()=0;
+    virtual void spieleranderReihe(int, bool)=0;
 protected:
     bool zustand;//true = Alles OK, false = upps Fehler
     bool hinweisausgegeben;

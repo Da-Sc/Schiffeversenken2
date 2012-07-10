@@ -13,6 +13,9 @@ for(i...) test[i]=new KLASSE(irgendwas, 123);
 
 int main(int argc, char* argv[])
 {
+    argc=0;
+    argv=0;
+
     BO_VERWALTUNG::setzeModus(1);
 
     //TESTS

@@ -168,9 +168,10 @@ void SPIEL::spielen(int anderreihe)
 
     zeigeSpielfelder(2);
 
-    BO_VERWALTUNG::holeInstanz()->textAusgeben("Schuss von SPIELER ",false);
+    /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Schuss von SPIELER ",false);
     BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-    BO_VERWALTUNG::holeInstanz()->textAusgeben(" auf: ",true);
+    BO_VERWALTUNG::holeInstanz()->textAusgeben(" auf: ",true);*/
+    BO_VERWALTUNG::holeInstanz()->spieleranderReihe(anderreihe,false);
     BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition,(anderreihe+1)%2);
 
     ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
@@ -180,9 +181,10 @@ void SPIEL::spielen(int anderreihe)
     while(ergebnis<0)
     {
         BO_VERWALTUNG::holeInstanz()->textAusgeben("Ausführung nicht möglich! Evtl. wurde dieses Feld bereits beschossen.\n",false);
-        BO_VERWALTUNG::holeInstanz()->textAusgeben("SPIELER ",false);
+        /*BO_VERWALTUNG::holeInstanz()->textAusgeben("SPIELER ",false);
         BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-        BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte widerholen: ",true);
+        BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte widerholen: ",true);*/
+        BO_VERWALTUNG::holeInstanz()->spieleranderReihe(anderreihe,true);
         BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition, (anderreihe+1)%2);
         ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
     }

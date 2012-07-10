@@ -27,6 +27,7 @@ public:
     virtual void ausgabeWasser(){}
     virtual void ausgabeTreffer(){}
     virtual void ausgabeVersenkt();
+    virtual void spieleranderReihe(int, bool);
 protected:
 private:
     void erneuereGraphischeOberflaeche();
@@ -61,6 +62,7 @@ private:
     TTF_Font* schriftart;//Font
     SDL_Rect platzfuerSchrift[3];
     SDL_Rect kompletterPlatzfuerSchrift;
+    SDL_Rect ausgabeFeldOben;
     SDL_Rect eingabenPlatz;
     int aktuelleZeile;
     SDL_Color textfarbe;//Textfarbe
@@ -72,6 +74,7 @@ private:
     double anteilRechtsfrei;
     double anteilObenfrei;
     double anteilUntenfrei;
+    SDL_Rect BMP_platz;
 
     //sonstiges
     template <typename T>

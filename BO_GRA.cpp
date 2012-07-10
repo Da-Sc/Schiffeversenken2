@@ -14,16 +14,29 @@ BO_GRA::BO_GRA()
     altPixelX=-1;
     altPixelY=-1;
 
+    //zusatz Felder für Schrift, oben und unten
+    int zusatzFensterOben = 35;
+    int zusatzFensterUnten = 88;
+
     fensterFarbtiefe=24;
     fensterBreite=1024;
     fensterHoehe=512;
 
+    BMP_platz.h=fensterHoehe;
+    BMP_platz.w=fensterBreite;
+    BMP_platz.x=0;
+    BMP_platz.y=zusatzFensterOben;
+
+    //neue Fenstergröße
+    fensterHoehe=fensterHoehe+zusatzFensterOben+zusatzFensterUnten;
+
+    //freie Anteile (= keine Spielfeld-felder) am angezeigten Fenster
     anteilLinksfrei=47./1024.;
     anteilRechtsfrei=21./512.;
-    anteilObenfrei=44./512.;
-    anteilUntenfrei=44./512.;
+    anteilObenfrei=(44.+zusatzFensterOben)/(512.+zusatzFensterOben+zusatzFensterUnten);
+    anteilUntenfrei=(44.+zusatzFensterUnten)/(512.+zusatzFensterUnten+zusatzFensterOben);
 
-    anteilSpielfeldHoehe=(462.-43.)/512.;
+    anteilSpielfeldHoehe=(462.-43.)/(512.+zusatzFensterOben+zusatzFensterUnten);
     anteilSpielfeldBreite=(469.-47.)/1024.;
 
     //Initalisiere SDL
@@ -44,7 +57,7 @@ BO_GRA::BO_GRA()
     }
 
     // Zeichenfläche erstellen
-    hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe+88, fensterFarbtiefe, SDL_SWSURFACE);
+    hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe, fensterFarbtiefe, SDL_SWSURFACE);
     if (hintergrundFenster==0)
     {
             std::cout << "Fehler beim Erzeugen der Oberflche." << std::endl;
@@ -70,7 +83,7 @@ BO_GRA::BO_GRA()
     double dtmp;
     for(int i=0; i<3; i++)
     {
-        dtmp=((1-(anteilObenfrei+anteilSpielfeldHoehe))*fensterHoehe+88)/3.;
+        dtmp=((1-(anteilObenfrei+anteilSpielfeldHoehe))*fensterHoehe)/3.;
         platzfuerSchrift[i].h=dtmp+1;
         platzfuerSchrift[i].w=fensterBreite;
         platzfuerSchrift[i].x=0;
@@ -78,7 +91,7 @@ BO_GRA::BO_GRA()
     }
     kompletterPlatzfuerSchrift.x=0;
     kompletterPlatzfuerSchrift.y=(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe;
-    kompletterPlatzfuerSchrift.h=((1-(anteilObenfrei+anteilSpielfeldHoehe))*fensterHoehe+88);
+    kompletterPlatzfuerSchrift.h=((1-(anteilObenfrei+anteilSpielfeldHoehe))*fensterHoehe);
     kompletterPlatzfuerSchrift.w=fensterBreite;
 
     aktuelleZeile=0;
@@ -91,6 +104,11 @@ BO_GRA::BO_GRA()
     eingabenPlatz.y=(anteilObenfrei+anteilSpielfeldHoehe)*fensterHoehe+platzfuerSchrift[0].h;
     eingabenPlatz.w=100;
     eingabenPlatz.h=60;
+
+    ausgabeFeldOben.x=0;
+    ausgabeFeldOben.y=0;
+    ausgabeFeldOben.h=zusatzFensterOben;
+    ausgabeFeldOben.w=fensterBreite;
 
     //Figuren laden:
     char pfadWasser[]="grafiken/W.bmp";
@@ -368,7 +386,16 @@ bool BO_GRA::positionErfragen(POSITION* tmpposition, int tmpSpieler)
 }
 
 void BO_GRA::warten(bool erneuern)
-{
+{   
+    SDL_FillRect(hintergrundFenster, &ausgabeFeldOben, farbe_weiss);
+    SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
+
+    SDL_Surface *textoberflaeche=0;
+    textoberflaeche=TTF_RenderText_Blended(schriftart,"Beliebige Taste druecken...",textfarbe);
+    SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&ausgabeFeldOben);
+    SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
+    SDL_FreeSurface(textoberflaeche);
+
     bool schleifeBeenden=false;
     SDL_Event ereignis; //event Container
     while(!schleifeBeenden)
@@ -390,6 +417,9 @@ void BO_GRA::warten(bool erneuern)
             exit(-1);
         }
     }
+    SDL_FillRect(hintergrundFenster, &ausgabeFeldOben, farbe_weiss);
+    SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
+
     if(erneuern) erneuereGraphischeOberflaeche();
 }
 
@@ -424,7 +454,7 @@ void BO_GRA::begruessung()
         exit(-1);
     }
 
-    SDL_Surface* textoberflaeche;
+    SDL_Surface* textoberflaeche=0;
 
     for(int i=0; i<5;i++)
     {
@@ -656,10 +686,10 @@ void BO_GRA::erneuereGraphischeOberflaeche()
             std::cin.get();
             exit(-1);
     }
-    bildFelder->h=fensterHoehe;
-    bildFelder->w=fensterBreite;
+    bildFelder->h=BMP_platz.h;
+    bildFelder->w=BMP_platz.w;
     //kopiere Bild (auch surface) auf schon fertiges Fenster
-    SDL_BlitSurface(bildFelder,0,hintergrundFenster,0);
+    SDL_BlitSurface(bildFelder,0,hintergrundFenster,&BMP_platz);
     //nicht mehr benötigte Bild-surface löschen
     SDL_FreeSurface(bildFelder);
 
@@ -697,4 +727,38 @@ void BO_GRA::ausgabeVersenkt()
     SDL_FreeSurface(textoberflaeche);
 
     warten(true);
+}
+
+void BO_GRA::spieleranderReihe(int tmpSpieler, bool wiederholung)
+{
+    SDL_FillRect(hintergrundFenster, &ausgabeFeldOben, farbe_weiss);
+    SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
+
+    char tmpChar1[] = "Schuss von SPIELER 0 auf:";
+    char tmpChar2[] = "SPIELER 0 bitte wiederholen:";
+    char *tmpChar = new char[28+1];
+
+    if(!wiederholung)
+    {
+        for(int i=0; i<25; i++)
+        {
+            tmpChar[i]=tmpChar1[i];
+        }
+        tmpChar[19]=tmpSpieler+1+48;
+        tmpChar[25]=0;
+    }
+    else
+    {
+        for(int i=0; i<28; i++)
+        {
+            tmpChar[i]=tmpChar2[i];
+        }
+        tmpChar[8]=tmpSpieler+1+48;
+        tmpChar[28]=0;
+    }
+
+    SDL_Surface* textoberflaeche=TTF_RenderText_Blended(schriftart,tmpChar,textfarbe);
+    SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&ausgabeFeldOben);
+    SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
+    SDL_FreeSurface(textoberflaeche);
 }
