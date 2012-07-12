@@ -56,7 +56,7 @@ bool SPIELFELD::istdaeinSchiff(ERWEITERTE_POSITION* xy)
 bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, int tmpSchiffnummer)//evtl. später noch durch differenzierte fehlermeldungen ersetzen
 {
 	int tmpSchifflaenge = gesetzteSchiffe[tmpSchiffnummer]->holeSchifflaenge();
-        ERWEITERTE_POSITION *xy = new ERWEITERTE_POSITION(tmpSchifflaenge);
+    ERWEITERTE_POSITION *xy = new ERWEITERTE_POSITION(tmpSchifflaenge);
 
 	for(int i=0; i<2; i++)
 	{
@@ -80,19 +80,32 @@ bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, in
                         xy->setzePositionX(i,kleineres(positionAnfang->holeX(),positionEnde->holeX())+i);
 		}
 	}
-	else return false;
+    else return false;
 
-        if(istdaeinSchiff(xy)) return false;
-        if(!gesetzteSchiffe[tmpSchiffnummer]->setzeaufSpielfeld(xy)) return false;
+    if(istdaeinSchiff(xy)) return false;
+    if(!gesetzteSchiffe[tmpSchiffnummer]->setzeaufSpielfeld(xy)) return false;
 
-        delete xy;
+    delete xy;
     return true;
 
 }
 
+void SPIELFELD::entferneSchiffe()
+{
+    for(int i=0; i<10; i++)
+    {
+        for(int j=0; j<10; j++)
+        {
+            if(Feld[i][j]->istSchiff())
+            {
+                Feld[i][j]=new EINZELNES_FELD();
+            }
+        }
+    }
+}
+
 bool SPIELFELD::ersetzedurchSchifflein(SCHIFFLEIN* zusetzendesSchiffsteil, int x, int y)
 {
-
     if(zusetzendesSchiffsteil==0 || x>9 || y>9 || x<0 || y<0) return false;
     if((Feld[x][y])->istSchiff()) return false;
 

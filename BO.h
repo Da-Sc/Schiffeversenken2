@@ -21,6 +21,7 @@ public:
     virtual void ausgabeTreffer()=0;
     virtual void ausgabeVersenkt()=0;
     virtual void spieleranderReihe(int, bool)=0;
+    virtual bool nachfrageGesetzteSchiffe(char*)=0;
 protected:
     bool zustand;//true = Alles OK, false = upps Fehler
     bool hinweisausgegeben;

@@ -28,9 +28,10 @@ public:
     virtual void ausgabeTreffer(){}
     virtual void ausgabeVersenkt();
     virtual void spieleranderReihe(int, bool);
+    virtual bool nachfrageGesetzteSchiffe(char*);
 protected:
 private:
-    void erneuereGraphischeOberflaeche();
+    void erneuereGraphischeOberflaeche(bool);
     void warten(bool);
 
     //Umrechnung von Feldindizes zu Pixelkoordinaten und umgekehrt
@@ -44,7 +45,9 @@ private:
     int fensterFarbtiefe;
     double anteilSpielfeldHoehe;
     double anteilSpielfeldBreite;
-    SDL_Surface* hintergrundFenster; //Fenster
+    //Fenster
+    SDL_Surface* hintergrundFenster;
+    SDL_Surface* bildFelder;
     Uint32 farbe_weiss;
     //einzelne Felder
     SDL_Surface *einzelFeldWasser;

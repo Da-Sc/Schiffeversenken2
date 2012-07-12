@@ -14,6 +14,7 @@ SCHIFFLEIN::SCHIFFLEIN(SCHIFF* zugehoerigesSchiff)
 SCHIFFLEIN::~SCHIFFLEIN()
 {
     //dtor
+    oberSchiff=0;
 }
 
 bool SCHIFFLEIN::istSchiff()

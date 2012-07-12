@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
     argv=0;
 
     BO_VERWALTUNG::setzeModus(1);
+    //BO_VERWALTUNG::setzeModus(0);
 
     //TESTS
     //BO_GRA test();
@@ -25,6 +26,7 @@ int main(int argc, char* argv[])
     SPIEL *EinPC_Spiel = new SPIEL();
 
     EinPC_Spiel->setzeSchiffe(0);
+    //uebergang (löschen etc.)?
     EinPC_Spiel->setzeSchiffe(1);
 
         //EinPC_Spiel->zeigeSpielfelder(3);

@@ -29,6 +29,7 @@ class BO_KOM : public BO
         virtual void ausgabeTreffer();
         virtual void ausgabeVersenkt();
         virtual void spieleranderReihe(int, bool);
+        virtual bool nachfrageGesetzteSchiffe(char*);
     protected:
         //bool zustand;//true = Alles OK, false = upps Fehler
         //bool hinweisausgegeben;

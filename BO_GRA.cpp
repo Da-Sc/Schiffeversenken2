@@ -11,8 +11,8 @@ BO_GRA::BO_GRA()
     laengegespeicherterChar=0;
 
     letzteSpielfeldausgabe = 0;
-    altPixelX=-1;
-    altPixelY=-1;
+    altPixelX=-10;
+    altPixelY=-10;
 
     //zusatz Felder für Schrift, oben und unten
     int zusatzFensterOben = 35;
@@ -69,7 +69,15 @@ BO_GRA::BO_GRA()
 
     SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
 
-    erneuereGraphischeOberflaeche();
+    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
+    if (bildFelder==0)
+    {
+            std::cout << "Grafik nicht verfuegbar." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
+
+    erneuereGraphischeOberflaeche(true);
 
     schriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
     if (schriftart==NULL)
@@ -159,6 +167,10 @@ BO_GRA::~BO_GRA()
     if (einzelFeldTreffer!=NULL)
     {
             SDL_FreeSurface(einzelFeldTreffer);
+    }
+    if(bildFelder!=0)
+    {
+            SDL_FreeSurface(bildFelder);
     }
     SDL_Quit();
 
@@ -386,7 +398,8 @@ bool BO_GRA::positionErfragen(POSITION* tmpposition, int tmpSpieler)
 }
 
 void BO_GRA::warten(bool erneuern)
-{   
+{
+    ausgabeFeldOben.w=fensterBreite;
     SDL_FillRect(hintergrundFenster, &ausgabeFeldOben, farbe_weiss);
     SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
 
@@ -420,7 +433,7 @@ void BO_GRA::warten(bool erneuern)
     SDL_FillRect(hintergrundFenster, &ausgabeFeldOben, farbe_weiss);
     SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
 
-    if(erneuern) erneuereGraphischeOberflaeche();
+    if(erneuern) erneuereGraphischeOberflaeche(true);
 }
 
 void BO_GRA::begruessung()
@@ -548,9 +561,9 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
         position.y=FeldNRHoeheinPixel(index.y)+1;
 
         //entsprechendes Bild einsetzen
-        if(tmpFeldchar[i]!='-')
+        if(letzteSpielfeldausgabe[i]!='-')
         {
-            switch(tmpFeldchar[i])
+            switch(letzteSpielfeldausgabe[i])
             {
             case 's':
                 einzelFeld=einzelFeldSchiff;
@@ -673,27 +686,18 @@ void BO_GRA::gewinnerAusgeben(int tmpGewinner)
     warten(false);
 }
 
-void BO_GRA::erneuereGraphischeOberflaeche()
+void BO_GRA::erneuereGraphischeOberflaeche(bool auchletzterStatus)
 {
     // Fülle Zeichenfläche mit Farbe
     SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
 
-    SDL_Surface* bildFelder=0;
-    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
-    if (bildFelder==0)
-    {
-            std::cout << "Grafik nicht verfuegbar." << std::endl;
-            std::cin.get();
-            exit(-1);
-    }
     bildFelder->h=BMP_platz.h;
     bildFelder->w=BMP_platz.w;
     //kopiere Bild (auch surface) auf schon fertiges Fenster
     SDL_BlitSurface(bildFelder,0,hintergrundFenster,&BMP_platz);
     //nicht mehr benötigte Bild-surface löschen
-    SDL_FreeSurface(bildFelder);
 
-    if(letzteSpielfeldausgabe!=0) spielfeldAusgabe(letzteSpielfeldausgabe);
+    if(letzteSpielfeldausgabe!=0 && auchletzterStatus) spielfeldAusgabe(letzteSpielfeldausgabe);
     aktuelleZeile=0;
 
     SDL_UpdateRect(hintergrundFenster,0,0,0,0);
@@ -731,6 +735,7 @@ void BO_GRA::ausgabeVersenkt()
 
 void BO_GRA::spieleranderReihe(int tmpSpieler, bool wiederholung)
 {
+    ausgabeFeldOben.w=fensterBreite;
     SDL_FillRect(hintergrundFenster, &ausgabeFeldOben, farbe_weiss);
     SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
 
@@ -757,8 +762,61 @@ void BO_GRA::spieleranderReihe(int tmpSpieler, bool wiederholung)
         tmpChar[28]=0;
     }
 
+    if(tmpSpieler==0) ausgabeFeldOben.x+=fensterBreite/2;
     SDL_Surface* textoberflaeche=TTF_RenderText_Blended(schriftart,tmpChar,textfarbe);
     SDL_BlitSurface(textoberflaeche,0,hintergrundFenster,&ausgabeFeldOben);
     SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
     SDL_FreeSurface(textoberflaeche);
+    ausgabeFeldOben.x=0;
+}
+
+bool BO_GRA::nachfrageGesetzteSchiffe(char* tmpSpielfeld)
+{
+    if(strlen(tmpSpielfeld)!=200)
+    {
+        std::cout << "Interner Fehler, Programm wird beendet!" << std::endl;
+        exit(-2);
+    }
+    else
+    {
+        if(letzteSpielfeldausgabe==0)letzteSpielfeldausgabe = new char[201];
+        kopiereArray<char>(tmpSpielfeld,letzteSpielfeldausgabe,200);
+        letzteSpielfeldausgabe[200]=0;
+    }
+    erneuereGraphischeOberflaeche(true);
+
+    textAusgeben("Wollen sie die Orte ihrer Schiffe korrigieren? (j,n)",true);
+    bool korrigieren=false;
+    bool schleifeBeenden=false;
+    SDL_Event ereignis; //event Container
+    while(!schleifeBeenden)
+    {
+        SDL_WaitEvent(&ereignis);
+        if(0 == SDL_WaitEvent(&ereignis))
+        {
+            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+            schleifeBeenden = true;
+            break;
+        }
+        if(ereignis.type==SDL_KEYDOWN || ereignis.type==SDL_KEYUP)
+        {
+            if(ereignis.key.keysym.sym==SDLK_j)
+            {
+                korrigieren=true;
+                schleifeBeenden=true;
+            }
+            else if(ereignis.key.keysym.sym==SDLK_n)
+            {
+                //korrigieren=false;
+                schleifeBeenden=true;
+            }
+        }
+        else if(ereignis.type==SDL_QUIT)
+        {
+            schleifeBeenden = true;
+            exit(-1);
+        }
+    }
+    erneuereGraphischeOberflaeche(false);
+    return korrigieren;
 }

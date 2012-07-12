@@ -248,3 +248,18 @@ void BO_KOM::spieleranderReihe(int tmpSpieler, bool wiederholung)
         textAusgeben(" bitte Wiederholen: ");
     }
 }
+bool BO_KOM::nachfrageGesetzteSchiffe(char* tmpSpielfeld)
+{
+    konsoleLoeschen();
+    textAusgeben("\nSind die Schiffe so korrekt gesetzt?\n\n");
+    spielfeldAusgabe(tmpSpielfeld);
+    textAusgeben("\nAlles OK: 0; Korrektur: 1 : ");
+    int tmp=1;
+    tmp=intErfragen();
+    while(tmp!=1 && tmp!=0)
+    {
+        textAusgeben("Falsche Auswahl (0 OK; 1 Korr.): ");
+        tmp=intErfragen();
+    }
+    return (bool)tmp;
+}
