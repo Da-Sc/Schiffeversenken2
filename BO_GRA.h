@@ -29,12 +29,18 @@ public:
     virtual void ausgabeVersenkt();
     virtual void spieleranderReihe(int, bool);
     virtual bool nachfrageGesetzteSchiffe(char*);
+    virtual bool schiffsetzen(int,POSITION*,POSITION*);
 protected:
 private:
     void erneuereGraphischeOberflaeche(bool);
+    void erneuereGraphischeOberflaeche(bool,SDL_Rect);
     void warten(bool);
+    void fuegeBMPein(char*, SDL_Rect, bool);
+    SDL_Surface* fuegeBMPein(SDL_Surface*, char*, SDL_Rect, bool);
+    void kopiereAufFenster(SDL_Surface*,SDL_Rect,bool);
 
     //Umrechnung von Feldindizes zu Pixelkoordinaten und umgekehrt
+    //Umstellen auf SDL_Rect ?!?!
     int FeldNRHoeheinPixel(int);
     int FeldNRBreiteinPixel(int,bool);
     int pixelPositionzuFeldNrX(double, bool);

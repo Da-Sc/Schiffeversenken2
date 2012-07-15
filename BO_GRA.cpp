@@ -143,6 +143,10 @@ BO_GRA::BO_GRA()
     einzelFeldVersenkt->w=anteilSpielfeldBreite/10.*fensterBreite-2;
     einzelFeldTreffer->h=anteilSpielfeldHoehe/10.*fensterHoehe-2;
     einzelFeldTreffer->w=anteilSpielfeldBreite/10.*fensterBreite-2;
+
+    //test
+    ERWEITERTE_POSITION *pos=new ERWEITERTE_POSITION(1);
+    schiffsetzen(5,pos,pos);
 }
 
 BO_GRA::~BO_GRA()
@@ -695,13 +699,84 @@ void BO_GRA::erneuereGraphischeOberflaeche(bool auchletzterStatus)
     bildFelder->w=BMP_platz.w;
     //kopiere Bild (auch surface) auf schon fertiges Fenster
     SDL_BlitSurface(bildFelder,0,hintergrundFenster,&BMP_platz);
-    //nicht mehr benötigte Bild-surface löschen
 
     if(letzteSpielfeldausgabe!=0 && auchletzterStatus) spielfeldAusgabe(letzteSpielfeldausgabe);
     aktuelleZeile=0;
 
     SDL_UpdateRect(hintergrundFenster,0,0,0,0);
 }
+
+void BO_GRA::erneuereGraphischeOberflaeche(bool, SDL_Rect tmpRect)
+{
+    //hier können natürlich noch positionen ausserhalb des eigentlichen bmp bereichs anfallen, SDL scheint das aber gut zu verwalten!
+    //einzelne rechtecke erneuern, teil des spielfeldes neu ausgeben
+    /*tmpRect.h=tmpRect.h+10;
+    tmpRect.w=tmpRect.w+10;
+    tmpRect.x=tmpRect.x-5;
+    tmpRect.y=tmpRect.y-5;*/
+
+    if(tmpRect.x<0)
+    {
+        std::cout << "korrektur!" << std::endl;
+        tmpRect.w=tmpRect.w+tmpRect.x;
+        tmpRect.x=0;
+    }
+    if(tmpRect.y<0)
+    {
+        std::cout << "korrektur!" << std::endl;
+        tmpRect.h=tmpRect.h+tmpRect.y;
+        tmpRect.y=0;
+    }
+
+    SDL_FillRect(hintergrundFenster, &tmpRect, farbe_weiss);
+    //->eventuell aus dem Fenster herausragendes wird entfernt! -> tmpRect geändert!
+
+    //kopieren des IM (sonst bei updaterects absturz) Fenster liegenden Bereichs, da tmpRect verkleinert wird wenn nicht der ganze Bereich im BMP-Feld liegt!
+    SDL_Rect tmpRect_sicherung = tmpRect;
+
+    if(tmpRect.x+tmpRect.w>BMP_platz.x && tmpRect.y+tmpRect.h>BMP_platz.y && tmpRect.x<BMP_platz.x+BMP_platz.w && tmpRect.y<BMP_platz.y+BMP_platz.h)
+    {
+        SDL_Rect tmpRect_BMP;
+        tmpRect_BMP.h=tmpRect.h;
+        tmpRect_BMP.w=tmpRect.w;
+        tmpRect_BMP.x=tmpRect.x-BMP_platz.x;
+        tmpRect_BMP.y=tmpRect.y-BMP_platz.y;
+
+        bildFelder->h=BMP_platz.h;
+        bildFelder->w=BMP_platz.w;
+        //kopiere Bild (auch surface) auf schon fertiges Fenster
+        SDL_BlitSurface(bildFelder,&tmpRect_BMP,hintergrundFenster,&tmpRect);
+    }
+    //tmpRect wurde erneut geändert!, eventuell aus dem BMP herausragendes wurde entfernt
+
+    /*da jetzt sicherstellung dass alles aktualisiert wird -> unnötig
+     *if(tmpRect.y<=BMP_platz.y)
+    {
+        std::cout << "erneuere Oben" << std::endl;
+        SDL_Rect tmpOben;
+        tmpOben.x=0;
+        tmpOben.y=0;
+        tmpOben.h=BMP_platz.y;
+        tmpOben.w=fensterBreite;
+        SDL_FillRect(hintergrundFenster, &tmpOben, farbe_weiss);
+        SDL_UpdateRects(hintergrundFenster,1,&tmpOben);
+    }
+    if((tmpRect.y+tmpRect.h)>=BMP_platz.y+BMP_platz.h)
+    {
+        std::cout << "erneuere Unten" << std::endl;
+        SDL_Rect tmpUnten;
+        tmpUnten.x=0;
+        tmpUnten.y=BMP_platz.y+BMP_platz.h;
+        tmpUnten.h=fensterHoehe-(BMP_platz.y+BMP_platz.h);
+        tmpUnten.w=fensterBreite;
+        SDL_FillRect(hintergrundFenster, &tmpUnten, farbe_weiss);
+        SDL_UpdateRects(hintergrundFenster,1,&tmpUnten);
+    }*/
+    aktuelleZeile=0;
+
+    SDL_UpdateRects(hintergrundFenster,1,&tmpRect_sicherung);
+}
+
 void BO_GRA::ausgabeVersenkt()
 {
 	SDL_Rect mittenaufFenster;
@@ -820,3 +895,200 @@ bool BO_GRA::nachfrageGesetzteSchiffe(char* tmpSpielfeld)
     erneuereGraphischeOberflaeche(false);
     return korrigieren;
 }
+
+bool BO_GRA::schiffsetzen(int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
+{
+    SDL_Rect rectSchiffvertikal,rectSchiffhorizontal;
+    rectSchiffvertikal=kompletterPlatzfuerSchrift;
+    rectSchiffhorizontal=kompletterPlatzfuerSchrift;
+
+    rectSchiffvertikal.x+=fensterBreite/3.;
+    rectSchiffhorizontal.x+=fensterBreite*(1./3.+anteilSpielfeldBreite/10.);
+
+    rectSchiffvertikal.h=(fensterHoehe*(anteilSpielfeldHoehe/10.)-1)*tmpLaenge;
+    rectSchiffvertikal.w=fensterBreite*(anteilSpielfeldBreite/10.)-1;
+    rectSchiffhorizontal.h=fensterHoehe*(anteilSpielfeldHoehe/10.)-1;
+    rectSchiffhorizontal.w=(fensterBreite*(anteilSpielfeldBreite/10.)-1)*tmpLaenge;
+
+    char tmpChar_pfad[] = "grafiken/schiffe/";
+    char tmpChar_horizontal[] = "horizontal.bmp";
+    char tmpChar_vertikal[] = "vertikal.bmp";
+    char tmpChar_laenge = tmpLaenge+48;
+
+    char tmpChar_pfad_vertikal[30+1];
+    char tmpChar_pfad_horizontal[32+1];
+
+    for(int i=0; i<17; i++)
+    {
+        tmpChar_pfad_horizontal[i]=tmpChar_pfad[i];
+        tmpChar_pfad_vertikal[i]=tmpChar_pfad[i];
+    }
+    tmpChar_pfad_horizontal[17]=tmpChar_laenge;
+    tmpChar_pfad_vertikal[17]=tmpChar_laenge;
+    for(int i=18; i<32; i++)
+    {
+        tmpChar_pfad_horizontal[i]=tmpChar_horizontal[i-18];
+        if(i<30)tmpChar_pfad_vertikal[i]=tmpChar_vertikal[i-18];
+    }
+    tmpChar_pfad_horizontal[32]=0;
+    tmpChar_pfad_vertikal[30]=0;
+
+    SDL_Surface* BMPschiffhorizontal=0;
+    SDL_Surface* BMPschiffvertikal=0;
+    BMPschiffhorizontal = fuegeBMPein(BMPschiffhorizontal,tmpChar_pfad_horizontal,rectSchiffhorizontal,true);
+    BMPschiffvertikal = fuegeBMPein(BMPschiffvertikal,tmpChar_pfad_vertikal,rectSchiffvertikal,true);
+
+    /*Uint32 farbe_blau = SDL_MapRGB(hintergrundFenster->format, 0, 0, 255);
+    Uint32 farbe_gruen = SDL_MapRGB(hintergrundFenster->format, 0, 255, 0);
+    SDL_FillRect(hintergrundFenster, &rectSchiffvertikal, farbe_blau);
+    SDL_UpdateRects(hintergrundFenster,1,&rectSchiffvertikal);
+    SDL_FillRect(hintergrundFenster, &rectSchiffhorizontal, farbe_gruen);
+    SDL_UpdateRects(hintergrundFenster,1,&rectSchiffhorizontal);*/
+
+
+    bool grosseSchleifeBeenden=false;
+    bool schleifeBeenden = false;
+    bool aufSchiffhorizontal;
+    bool aufSchiffvertikal;
+    int tmpX,tmpY;
+
+    SDL_Event ereignis; //event Container
+    while(!schleifeBeenden)
+    {
+        SDL_WaitEvent(&ereignis);
+        if(0 == SDL_WaitEvent(&ereignis))
+        {
+            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+            schleifeBeenden = true;
+            break;
+        }
+        //std::cout << "an event: " << std::clock() << " : " << (int)ereignis.type << std::endl;
+        switch(ereignis.type)
+        {
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEBUTTONDOWN:
+            tmpX=ereignis.button.x;
+            tmpY=ereignis.button.y;
+            aufSchiffhorizontal = (tmpX>=rectSchiffhorizontal.x && tmpX<=(rectSchiffhorizontal.x+rectSchiffhorizontal.w)) && (tmpY>=rectSchiffhorizontal.y && tmpY<=(rectSchiffhorizontal.y+rectSchiffhorizontal.h));
+            aufSchiffvertikal = (tmpX>=rectSchiffvertikal.x && tmpX<=(rectSchiffvertikal.x+rectSchiffvertikal.w)) && (tmpY>=rectSchiffvertikal.y && tmpY<=(rectSchiffvertikal.y+rectSchiffvertikal.h));
+            //wurde die maus seit dem letzten maustasten ereignis bewegt?
+            if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
+            {
+                //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
+                if(aufSchiffhorizontal)
+                {
+                    //Schiffhorizontal
+                    schleifeBeenden=true;
+                    //std::cout << "horizontales Schiff" << std::endl;
+                }
+                else if(aufSchiffvertikal)
+                {
+                    //Schiffvertikal
+                    schleifeBeenden=true;
+                    //std::cout << "vertikales Schiff" << std::endl;
+                }
+            }
+            altPixelX=tmpX;
+            altPixelY=tmpY;
+            break;
+        case SDL_QUIT:
+            schleifeBeenden = true;
+            exit(-1);
+            break;
+        default:
+            break;
+        }
+    }
+
+    erneuereGraphischeOberflaeche(true,rectSchiffhorizontal);
+    erneuereGraphischeOberflaeche(true,rectSchiffvertikal);
+
+    schleifeBeenden=false;
+    while(!schleifeBeenden)
+    {
+        if(0 == SDL_WaitEvent(&ereignis))
+        {
+            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+            schleifeBeenden = true;
+            break;
+        }
+        switch(ereignis.type)
+        {
+        case SDL_MOUSEMOTION:
+            if(aufSchiffhorizontal)
+            {
+                erneuereGraphischeOberflaeche(true, rectSchiffhorizontal);
+                rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w/2.);
+                rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                kopiereAufFenster(BMPschiffhorizontal,rectSchiffhorizontal,true);
+            }
+            else
+            {
+                erneuereGraphischeOberflaeche(true, rectSchiffvertikal);
+                rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h/2.);
+                kopiereAufFenster(BMPschiffvertikal,rectSchiffvertikal,true);
+            }
+            break;
+        case SDL_QUIT:
+            schleifeBeenden = true;
+            exit(0);
+            break;
+        default:
+            break;
+        } // switch(event.type)
+    } // while(!schleifeBeenden)
+
+    warten(false);
+    return true;
+}
+
+void BO_GRA::fuegeBMPein(char* tmpPfad, SDL_Rect tmpPosition, bool erneuern)
+{
+    SDL_Surface *tmpBMP = SDL_LoadBMP(tmpPfad);
+    if (tmpBMP==0)
+    {
+            std::cout << "Grafik in " << tmpPfad << " nicht verfuegbar." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
+
+    tmpBMP->w=tmpPosition.w;
+    tmpBMP->h=tmpPosition.h;
+
+    SDL_BlitSurface(tmpBMP,0,hintergrundFenster,&tmpPosition);
+
+    if(erneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+
+    if(tmpBMP!=0)
+    {
+            SDL_FreeSurface(tmpBMP);
+    }
+}
+
+SDL_Surface* BO_GRA::fuegeBMPein(SDL_Surface* zurueckzugebendesBild, char* tmpPfad, SDL_Rect tmpPosition, bool erneuern)
+{
+    zurueckzugebendesBild = SDL_LoadBMP(tmpPfad);
+    if (zurueckzugebendesBild==0)
+    {
+        std::cout << "Grafik in " << tmpPfad << " nicht verfuegbar." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
+    zurueckzugebendesBild->w=tmpPosition.w;
+    zurueckzugebendesBild->h=tmpPosition.h;
+
+    SDL_BlitSurface(zurueckzugebendesBild,0,hintergrundFenster,&tmpPosition);
+
+    if(erneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+
+    return zurueckzugebendesBild;
+}
+
+void BO_GRA::kopiereAufFenster(SDL_Surface* tmpzukopieren,SDL_Rect tmpPosition,bool teilerneuern)
+{
+    SDL_BlitSurface(tmpzukopieren,0,hintergrundFenster,&tmpPosition);
+    if(teilerneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+}
+

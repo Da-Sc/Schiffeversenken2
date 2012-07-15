@@ -48,6 +48,19 @@ ERWEITERTE_POSITION::ERWEITERTE_POSITION(int tmplaenge)
         y[i]=0;
     }
 }
+//KopierKonstruktor
+ERWEITERTE_POSITION::ERWEITERTE_POSITION(ERWEITERTE_POSITION *tmpZukopieren)
+{
+    this->laenge=tmpZukopieren->holeLaenge();
+    this->x=new int[laenge];
+    this->y=new int[laenge];
+    for(int i=0; i<laenge; i++)
+    {
+        x[i]=tmpZukopieren->holeX(i);
+        y[i]=tmpZukopieren->holeY(i);
+    }
+}
+
 ERWEITERTE_POSITION::~ERWEITERTE_POSITION()
 {
     delete[] x;

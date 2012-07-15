@@ -25,6 +25,7 @@ class SCHIFF
         int nochSchwimmendeTeile;
         SCHIFFLEIN* *ausSchiffleinBestehend;
         SPIELFELD* aufFeld;
+        ERWEITERTE_POSITION* positionenSchifflein;
 };
 
 #endif // SCHIFF_H

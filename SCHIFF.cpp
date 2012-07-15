@@ -7,23 +7,30 @@ SCHIFF::SCHIFF()
 	nochSchwimmendeTeile=0;
 	ausSchiffleinBestehend=0;
 	aufFeld=0;
+    positionenSchifflein=0;
 }
 
 SCHIFF::SCHIFF(SPIELFELD* tmpfeld)
 {
     //ctor
+    Schifflaenge=0;
     aufFeld=tmpfeld;
     ausSchiffleinBestehend=0;
 	nochSchwimmendeTeile=0;
+    positionenSchifflein=0;
 }
 
 SCHIFF::~SCHIFF()
 {
     //dtor
-    for(int i=0; i<Schifflaenge; i++)
+    if(ausSchiffleinBestehend!=0)
     {
-        delete ausSchiffleinBestehend[i];
+        for(int i=0; i<Schifflaenge; i++)
+        {
+            delete ausSchiffleinBestehend[i];
+        }
     }
+    if(positionenSchifflein!=0) delete positionenSchifflein;
 }
 
 void SCHIFF::legeSchifflaengefest(int tmplaenge)
@@ -50,6 +57,7 @@ bool SCHIFF::setzeaufSpielfeld(ERWEITERTE_POSITION* xy)
         if(xy->holeX(i)<0 || xy->holeY(i)<0) return false;
         if(!aufFeld->ersetzedurchSchifflein(ausSchiffleinBestehend[i],xy->holeX(i),xy->holeY(i))) return false;
     }
+    positionenSchifflein = new ERWEITERTE_POSITION(xy);//bringt das überhaupt was?
     return true;
 }
 

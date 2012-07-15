@@ -4,7 +4,7 @@
 SPIEL::SPIEL()
 {
     //ctor
-    auszugebendesSpielfeld = new char[200+1];//char auszugebendesSpielfeld[201];
+    auszugebendesSpielfeld = new char[200+1];
     for(int i=0; i<201; i++)
     {
         auszugebendesSpielfeld[i]=0;
@@ -14,7 +14,7 @@ SPIEL::SPIEL()
     BO_VERWALTUNG::holeInstanz()->konsoleLoeschen();
     BO_VERWALTUNG::holeInstanz()->textAusgeben("Neues Spiel gestartet\n",false);//beim Spiel ausgeben
     BO_VERWALTUNG::holeInstanz()->begruessung();
-    //BO_VERWALTUNG::holeInstanz()->textAusgeben("\nAllgemeine Regeln vereinbaren:\n\n",true);
+
     BO_VERWALTUNG::holeInstanz()->textAusgeben("Allgemeine Regeln vereinbaren\n",false);
 	do{
                 BO_VERWALTUNG::holeInstanz()->textAusgeben("Bitte die Anzahl an Schiffen (1-5) eingeben: ",true);//beim Spiel ausgeben
@@ -63,14 +63,12 @@ void SPIEL::setzeSchiffe(int Spieler)
     BO_VERWALTUNG::holeInstanz()->zahlAusgeben(Spieler+1,false);
     BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte Schiffe setzen:\n",false);
 
-    //BO_VERWALTUNG::holeInstanz()->textAusgeben("\n",false);
     BO_VERWALTUNG::holeInstanz()->spielfeldAusgabe(zeigeSpielfelder(2));
-    //BO_VERWALTUNG::holeInstanz()->textAusgeben("\n",true);
 
     bool falschgestzt=false;
 
     do{
-        if(falschgestzt) Meer[Spieler]->entferneSchiffe();//PROBLEM STUERZT AB
+        if(falschgestzt) Meer[Spieler]->entferneSchiffe();
         for(int i=0; i<AnzahlSchiffe; i++)
         {
             BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff ",false); //bei allen ausgeben -> anderer Spieler auch informiert
@@ -102,7 +100,6 @@ void SPIEL::setzeSchiffe(int Spieler)
                     }
                     else
                     {
-                        //BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff erfolgreich gesetzt.\n\n",true);
                         BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff erfolgreich gesetzt.\n",true);
                     }
                 }
@@ -110,10 +107,7 @@ void SPIEL::setzeSchiffe(int Spieler)
         }
         falschgestzt = BO_VERWALTUNG::holeInstanz()->nachfrageGesetzteSchiffe(zeigeSpielfelder(Spieler));
     }while(falschgestzt);
-    /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler ",false);
-    BO_VERWALTUNG::holeInstanz()->zahlAusgeben(Spieler+1,false);
-    BO_VERWALTUNG::holeInstanz()->textAusgeben(" fertig mit setzen seiner Schiffe.\n",true);*/
-    //nachfrage einbauen ob alles OK
+
     BO_VERWALTUNG::holeInstanz()->konsoleLoeschen();
 
 }
@@ -132,7 +126,6 @@ char* SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
     bool alles=false;
     if(zeigenfuer==3) alles=true;
 
-    //char auszugebendesSpielfeld[201];
     for(int i=0; i<201; i++)
     {
         auszugebendesSpielfeld[i]=0;
@@ -151,7 +144,6 @@ char* SPIEL::zeigeSpielfelder(int zeigenfuer)//2=allgemein, 3=alles
             }
         }
     }
-    //BO_VERWALTUNG::holeInstanz()->spielfeldAusgabe(auszugebendesSpielfeld);
     return auszugebendesSpielfeld;
 }
 
@@ -170,9 +162,6 @@ void SPIEL::spielen(int anderreihe)
 
     BO_VERWALTUNG::holeInstanz()->spielfeldAusgabe(zeigeSpielfelder(2));
 
-    /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Schuss von SPIELER ",false);
-    BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-    BO_VERWALTUNG::holeInstanz()->textAusgeben(" auf: ",true);*/
     BO_VERWALTUNG::holeInstanz()->spieleranderReihe(anderreihe,false);
     BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition,(anderreihe+1)%2);
 
@@ -183,9 +172,6 @@ void SPIEL::spielen(int anderreihe)
     while(ergebnis<0)
     {
         BO_VERWALTUNG::holeInstanz()->textAusgeben("Ausführung nicht möglich! Evtl. wurde dieses Feld bereits beschossen.\n",false);
-        /*BO_VERWALTUNG::holeInstanz()->textAusgeben("SPIELER ",false);
-        BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-        BO_VERWALTUNG::holeInstanz()->textAusgeben(" bitte widerholen: ",true);*/
         BO_VERWALTUNG::holeInstanz()->spieleranderReihe(anderreihe,true);
         BO_VERWALTUNG::holeInstanz()->positionErfragen(schussaufposition, (anderreihe+1)%2);
         ergebnis=Meer[(anderreihe+1)%2]->Schuss(schussaufposition->holeX(),schussaufposition->holeY());
@@ -194,28 +180,19 @@ void SPIEL::spielen(int anderreihe)
     //Wasser
     if(ergebnis==0)
     {
-        BO_VERWALTUNG::holeInstanz()->ausgabeWasser();//textAusgeben("--- WASSER --- :( \n",false);
+        BO_VERWALTUNG::holeInstanz()->ausgabeWasser();
         spielen((anderreihe+1)%2);
     }
 
     //Schiff
     if(ergebnis>0)
     {
-        BO_VERWALTUNG::holeInstanz()->ausgabeTreffer(); //textAusgeben("=== TREFFER ! === :) \n",false);
-        if(ergebnis==2) BO_VERWALTUNG::holeInstanz()->ausgabeVersenkt(); //textAusgeben("Schiff VERSENKT ;) \n",false);
+        BO_VERWALTUNG::holeInstanz()->ausgabeTreffer();
+        if(ergebnis==2) BO_VERWALTUNG::holeInstanz()->ausgabeVersenkt();
         if(Meer[(anderreihe+1)%2]->verloren())
         {
-            //BO_VERWALTUNG::holeInstanz()->textAusgeben("\n\nSpieler",false);
-            /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler",false);
-            BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-            BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);*/
             BO_VERWALTUNG::holeInstanz()->spielfeldAusgabe(zeigeSpielfelder(3));
-            //BO_VERWALTUNG::holeInstanz()->textAusgeben("\n\nSpieler",false);
-            /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Spieler",false);
-            BO_VERWALTUNG::holeInstanz()->zahlAusgeben(anderreihe+1,false);
-            BO_VERWALTUNG::holeInstanz()->textAusgeben(" hat GEWONNEN!!!\n",false);*/
             BO_VERWALTUNG::holeInstanz()->gewinnerAusgeben(anderreihe);
-            //BO_VERWALTUNG::holeInstanz()->intErfragen();
             delete BO_VERWALTUNG::holeInstanz();
             return;
         }
