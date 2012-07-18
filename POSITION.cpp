@@ -37,6 +37,18 @@ int POSITION::holeY()
     return y;
 }
 
+void POSITION::inkrementiereX()
+{
+    x++;
+    if(x>9) x=0;
+}
+
+void POSITION::inkrementiereY()
+{
+    y++;
+    if(y>9) y=0;
+}
+
 ERWEITERTE_POSITION::ERWEITERTE_POSITION(int tmplaenge)
 {
     laenge=tmplaenge;

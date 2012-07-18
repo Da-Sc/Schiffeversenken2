@@ -37,7 +37,8 @@ private:
     void warten(bool);
     void fuegeBMPein(char*, SDL_Rect, bool);
     SDL_Surface* fuegeBMPein(SDL_Surface*, char*, SDL_Rect, bool);
-    void kopiereAufFenster(SDL_Surface*,SDL_Rect,bool);
+    void kopiereSoweitmoeglichAufFenster(SDL_Surface*,SDL_Rect,bool);//kopiert die Surface aufs hintergrundfenster an die Rect Position, verkleinert die Surfacegröße aber entsprechend!
+    void kopiereAusschnittAufFenster(SDL_Surface*,SDL_Rect,SDL_Rect,bool);
 
     //Umrechnung von Feldindizes zu Pixelkoordinaten und umgekehrt
     //Umstellen auf SDL_Rect ?!?!

@@ -10,6 +10,8 @@ public:
     int holePosition(int);
     int holeX();
     int holeY();
+    void inkrementiereX();
+    void inkrementiereY();
 private:
     int x;
     int y;

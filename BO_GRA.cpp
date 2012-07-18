@@ -69,15 +69,19 @@ BO_GRA::BO_GRA()
 
     SDL_WM_SetCaption("Schiffeversenken", "Schiffeversenken");
 
-    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
-    if (bildFelder==0)
-    {
-            std::cout << "Grafik nicht verfuegbar." << std::endl;
-            std::cin.get();
-            exit(-1);
-    }
+    SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
+    bildFelder = fuegeBMPein(bildFelder,"grafiken/schiffeversenken_2Felder.bmp",BMP_platz,false);
+    SDL_Flip(hintergrundFenster);
 
-    erneuereGraphischeOberflaeche(true);
+//    bildFelder = SDL_LoadBMP("grafiken/schiffeversenken_2Felder.bmp");
+//    if (bildFelder==0)
+//    {
+//            std::cout << "Grafik nicht verfuegbar." << std::endl;
+//            std::cin.get();
+//            exit(-1);
+//    }
+
+    //erneuereGraphischeOberflaeche(true);
 
     schriftart=TTF_OpenFont("grafiken/Arial_Black.ttf",24);//sollte zur Not sowohl in windows wie auch ubuntu (mscorefonts) verfügbar sein
     if (schriftart==NULL)
@@ -553,16 +557,17 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
 	letzteSpielfeldausgabe[200]=0;
 
     SDL_Surface *einzelFeld;
-    SDL_Rect position,index;
+    SDL_Rect position;
+    POSITION index;
     position.x=0;
     position.y=0;
-    index.x=0;
-    index.y=0;
+    index.setzePositionX(0);
+    index.setzePositionY(0);
     bool rechts=false;
     for(int i=0; i<200; i++)
     {
-        position.x=FeldNRBreiteinPixel(index.x,rechts)+1;
-        position.y=FeldNRHoeheinPixel(index.y)+1;
+        position.x=FeldNRBreiteinPixel(index.holeX(),rechts)+1;
+        position.y=FeldNRHoeheinPixel(index.holeY())+1;
 
         //entsprechendes Bild einsetzen
         if(letzteSpielfeldausgabe[i]!='-')
@@ -587,23 +592,24 @@ void BO_GRA::spielfeldAusgabe(char* tmpFeldchar)
             }
             position.h=einzelFeld->h;
             position.w=einzelFeld->w;
-            SDL_BlitSurface(einzelFeld,0,hintergrundFenster,&position);
+            //SDL_BlitSurface(einzelFeld,0,hintergrundFenster,&position);
+            kopiereSoweitmoeglichAufFenster(einzelFeld,position,true);
             einzelFeld=0;
 
-            SDL_UpdateRects(hintergrundFenster,1,&position);
+            //SDL_UpdateRects(hintergrundFenster,1,&position);
         }
         //position auf Feld bestimmen
         if((i+1)%10==0)
         {
-            index.x=0;
+            //index.setzePositionX(0);
             rechts=(rechts+1)%2;
             if((i+1)%20==0)
             {
-                index.x=0;
-                index.y++;
+                //index.setzePositionX(0);
+                index.inkrementiereY();
             }
         }
-        else index.x++;
+        /*else*/ index.inkrementiereX();//setzt automatisch auf 0 wenn x > 9
     }
 }
 
@@ -717,13 +723,11 @@ void BO_GRA::erneuereGraphischeOberflaeche(bool, SDL_Rect tmpRect)
 
     if(tmpRect.x<0)
     {
-        std::cout << "korrektur!" << std::endl;
         tmpRect.w=tmpRect.w+tmpRect.x;
         tmpRect.x=0;
     }
     if(tmpRect.y<0)
     {
-        std::cout << "korrektur!" << std::endl;
         tmpRect.h=tmpRect.h+tmpRect.y;
         tmpRect.y=0;
     }
@@ -732,7 +736,7 @@ void BO_GRA::erneuereGraphischeOberflaeche(bool, SDL_Rect tmpRect)
     //->eventuell aus dem Fenster herausragendes wird entfernt! -> tmpRect geändert!
 
     //kopieren des IM (sonst bei updaterects absturz) Fenster liegenden Bereichs, da tmpRect verkleinert wird wenn nicht der ganze Bereich im BMP-Feld liegt!
-    SDL_Rect tmpRect_sicherung = tmpRect;
+    //SDL_Rect tmpRect_sicherung = tmpRect;
 
     if(tmpRect.x+tmpRect.w>BMP_platz.x && tmpRect.y+tmpRect.h>BMP_platz.y && tmpRect.x<BMP_platz.x+BMP_platz.w && tmpRect.y<BMP_platz.y+BMP_platz.h)
     {
@@ -742,11 +746,16 @@ void BO_GRA::erneuereGraphischeOberflaeche(bool, SDL_Rect tmpRect)
         tmpRect_BMP.x=tmpRect.x-BMP_platz.x;
         tmpRect_BMP.y=tmpRect.y-BMP_platz.y;
 
-        bildFelder->h=BMP_platz.h;
-        bildFelder->w=BMP_platz.w;
+        kopiereAusschnittAufFenster(bildFelder,tmpRect_BMP,tmpRect,true);
+        aktuelleZeile=0;
+
+
+        //bildFelder->h=BMP_platz.h;
+        //bildFelder->w=BMP_platz.w;
         //kopiere Bild (auch surface) auf schon fertiges Fenster
-        SDL_BlitSurface(bildFelder,&tmpRect_BMP,hintergrundFenster,&tmpRect);
+        //SDL_BlitSurface(bildFelder,&tmpRect_BMP,hintergrundFenster,&tmpRect);
     }
+    else SDL_UpdateRects(hintergrundFenster,1,&tmpRect);
     //tmpRect wurde erneut geändert!, eventuell aus dem BMP herausragendes wurde entfernt
 
     /*da jetzt sicherstellung dass alles aktualisiert wird -> unnötig
@@ -772,9 +781,8 @@ void BO_GRA::erneuereGraphischeOberflaeche(bool, SDL_Rect tmpRect)
         SDL_FillRect(hintergrundFenster, &tmpUnten, farbe_weiss);
         SDL_UpdateRects(hintergrundFenster,1,&tmpUnten);
     }*/
-    aktuelleZeile=0;
 
-    SDL_UpdateRects(hintergrundFenster,1,&tmpRect_sicherung);
+    //SDL_UpdateRects(hintergrundFenster,1,&tmpRect_sicherung);
 }
 
 void BO_GRA::ausgabeVersenkt()
@@ -1018,17 +1026,57 @@ bool BO_GRA::schiffsetzen(int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
             if(aufSchiffhorizontal)
             {
                 erneuereGraphischeOberflaeche(true, rectSchiffhorizontal);
-                rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w/2.);
-                rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
-                kopiereAufFenster(BMPschiffhorizontal,rectSchiffhorizontal,true);
+                if(tmpLaenge%2!=0)
+                {
+                    rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w/2.);
+                    rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                }
+                else if(tmpLaenge==4)
+                {
+                    rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w*(1./4.+1./8.));
+                    rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                }
+                else
+                {
+                    rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w*(1./4.));
+                    rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                }
+                kopiereSoweitmoeglichAufFenster(BMPschiffhorizontal,rectSchiffhorizontal,true);
             }
             else
             {
                 erneuereGraphischeOberflaeche(true, rectSchiffvertikal);
-                rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
-                rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h/2.);
-                kopiereAufFenster(BMPschiffvertikal,rectSchiffvertikal,true);
+                if(tmpLaenge%2!=0)
+                {
+                    rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                    rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h/2.);
+                }
+                else if(tmpLaenge==4)
+                {
+                    rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                    rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h*(1./4.+1./8.));
+                }
+                else
+                {
+                    rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                    rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h*(1./4.));
+                }
+                kopiereSoweitmoeglichAufFenster(BMPschiffvertikal,rectSchiffvertikal,true);
             }
+            break;
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEBUTTONDOWN:
+            tmpX=ereignis.button.x;
+            tmpY=ereignis.button.y;
+            //wurde die maus seit dem letzten maustasten ereignis bewegt?
+            if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
+            {
+                //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
+                //Position setzen-> false ->große schleife nicht beenden neu von 1. schleife
+                //               -> ok links und rechts testen, versuchen in anfang und end Positionen zu speichern
+            }
+            altPixelX=tmpX;
+            altPixelY=tmpY;
             break;
         case SDL_QUIT:
             schleifeBeenden = true;
@@ -1039,7 +1087,7 @@ bool BO_GRA::schiffsetzen(int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
         } // switch(event.type)
     } // while(!schleifeBeenden)
 
-    warten(false);
+    warten(false);//später natürlich entfernen
     return true;
 }
 
@@ -1086,9 +1134,18 @@ SDL_Surface* BO_GRA::fuegeBMPein(SDL_Surface* zurueckzugebendesBild, char* tmpPf
     return zurueckzugebendesBild;
 }
 
-void BO_GRA::kopiereAufFenster(SDL_Surface* tmpzukopieren,SDL_Rect tmpPosition,bool teilerneuern)
+void BO_GRA::kopiereSoweitmoeglichAufFenster(SDL_Surface* tmpzukopieren,SDL_Rect tmpPosition,bool teilerneuern)
 {
+    tmpzukopieren->w=tmpPosition.w;
+    tmpzukopieren->h=tmpPosition.h;
     SDL_BlitSurface(tmpzukopieren,0,hintergrundFenster,&tmpPosition);
     if(teilerneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+}
+
+void BO_GRA::kopiereAusschnittAufFenster(SDL_Surface* tmpzukopieren,SDL_Rect tmpPositionVon,SDL_Rect tmpPositionNach,bool teilerneuern)
+{
+    SDL_Rect tmpPositionNach_sicherung=tmpPositionNach;
+    SDL_BlitSurface(tmpzukopieren,&tmpPositionVon,hintergrundFenster,&tmpPositionNach);
+    if(teilerneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPositionNach_sicherung);
 }
 
