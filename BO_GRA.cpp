@@ -149,9 +149,9 @@ BO_GRA::BO_GRA()
     einzelFeldTreffer->w=anteilSpielfeldBreite/10.*fensterBreite-2;
 
     //test
-    POSITION *pos1=new POSITION();
-    POSITION *pos2=new POSITION();
-    schiffsetzen(0,5,pos1,pos2);
+    //POSITION *pos1=new POSITION();
+    //POSITION *pos2=new POSITION();
+    //schiffsetzen(0,5,pos1,pos2);
 }
 
 BO_GRA::~BO_GRA()
@@ -1076,6 +1076,7 @@ bool BO_GRA::schiffsetzen(int tmpSpieler, int tmpLaenge, POSITION *tmpAnfang, PO
                 //wurde die maus seit dem letzten maustasten ereignis bewegt?
                 if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
                 {
+                    //std::cout << "X: " << pixelPositionzuFeldNrX(tmpX,tmpSpieler) << " Y: " << pixelPositionzuFeldNrY(tmpY) << std::endl;
                     if(tmpAnfang->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpAnfang->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
                     {
                         //zumindest die Mausposition passt
@@ -1102,6 +1103,53 @@ bool BO_GRA::schiffsetzen(int tmpSpieler, int tmpLaenge, POSITION *tmpAnfang, PO
                                 }
                             }
                         }
+                        else if(tmpLaenge==4)
+                        {
+                            if(aufSchiffhorizontal)
+                            {
+                                anfangrichtig = (tmpAnfang->setzePositionX( (pixelPositionzuFeldNrX(tmpX,tmpSpieler)-1) ) && tmpAnfang->setzePositionY( pixelPositionzuFeldNrY(tmpY)));
+                                enderichtig = ( tmpEnde->setzePositionX((pixelPositionzuFeldNrX(tmpX,tmpSpieler)+2)) && tmpEnde->setzePositionY( pixelPositionzuFeldNrY(tmpY)) );
+                                if( anfangrichtig && enderichtig )
+                                {
+                                    schleifeBeenden=true;
+                                    grosseSchleifeBeenden=true;
+                                }
+                            }
+                            else //aufSchiffvertikal
+                            {
+                                anfangrichtig = (tmpAnfang->setzePositionX( (pixelPositionzuFeldNrX(tmpX,tmpSpieler)) ) && tmpAnfang->setzePositionY( pixelPositionzuFeldNrY(tmpY)-2));
+                                enderichtig = ( tmpEnde->setzePositionX((pixelPositionzuFeldNrX(tmpX,tmpSpieler))) && tmpEnde->setzePositionY( pixelPositionzuFeldNrY(tmpY)+1) );
+                                if(anfangrichtig && enderichtig)
+                                {
+                                    schleifeBeenden=true;
+                                    grosseSchleifeBeenden=true;
+                                }
+                            }
+                        }
+                        else if(tmpLaenge==2)
+                        {
+                            if(aufSchiffhorizontal)
+                            {
+                                anfangrichtig = (tmpAnfang->setzePositionX( (pixelPositionzuFeldNrX(tmpX,tmpSpieler)) ) && tmpAnfang->setzePositionY( pixelPositionzuFeldNrY(tmpY)));
+                                enderichtig = ( tmpEnde->setzePositionX((pixelPositionzuFeldNrX(tmpX,tmpSpieler)+1)) && tmpEnde->setzePositionY( pixelPositionzuFeldNrY(tmpY)) );
+                                if( anfangrichtig && enderichtig )
+                                {
+                                    schleifeBeenden=true;
+                                    grosseSchleifeBeenden=true;
+                                }
+                            }
+                            else //aufSchiffvertikal
+                            {
+                                anfangrichtig = (tmpAnfang->setzePositionX( (pixelPositionzuFeldNrX(tmpX,tmpSpieler)) ) && tmpAnfang->setzePositionY( pixelPositionzuFeldNrY(tmpY)-1));
+                                enderichtig = ( tmpEnde->setzePositionX((pixelPositionzuFeldNrX(tmpX,tmpSpieler))) && tmpEnde->setzePositionY( pixelPositionzuFeldNrY(tmpY)) );
+                                if(anfangrichtig && enderichtig)
+                                {
+                                    schleifeBeenden=true;
+                                    grosseSchleifeBeenden=true;
+                                }
+                            }
+                        }
+                        else return false;
                     }
                     else
                     {

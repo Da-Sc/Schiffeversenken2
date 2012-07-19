@@ -22,3 +22,4 @@ class SPIEL
 };
 
 #endif // SPIEL_H
+//0:0 IST LINKS UNTEN!

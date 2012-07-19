@@ -71,7 +71,7 @@ void SPIEL::setzeSchiffe(int Spieler)
         if(falschgestzt) Meer[Spieler]->entferneSchiffe();
         for(int i=0; i<AnzahlSchiffe; i++)
         {
-            BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff ",false); //bei allen ausgeben -> anderer Spieler auch informiert
+            /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff ",false); //bei allen ausgeben -> anderer Spieler auch informiert
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(i+1,false);
             BO_VERWALTUNG::holeInstanz()->textAusgeben(" (Länge: ",false);
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(Schifflaenge[i],false);
@@ -103,8 +103,19 @@ void SPIEL::setzeSchiffe(int Spieler)
                         BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff erfolgreich gesetzt.\n",true);
                     }
                 }
+            }*/
+            BO_VERWALTUNG::holeInstanz()->schiffsetzen(Spieler,Schifflaenge[i],tmpPositionAnfang,tmpPositionEnde);
+            if(!Meer[Spieler]->setzeSchiff(tmpPositionAnfang,tmpPositionEnde,i))
+            {
+                BO_VERWALTUNG::holeInstanz()->textAusgeben("Fehler beim platzieren (falsche Länge, anderes Schiff im Weg...)\n",false);
+                i--;
+            }
+            else
+            {
+                BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff erfolgreich gesetzt.\n",true);
             }
         }
+
         falschgestzt = BO_VERWALTUNG::holeInstanz()->nachfrageGesetzteSchiffe(zeigeSpielfelder(Spieler));
     }while(falschgestzt);
 
