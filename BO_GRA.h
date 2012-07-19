@@ -29,14 +29,16 @@ public:
     virtual void ausgabeVersenkt();
     virtual void spieleranderReihe(int, bool);
     virtual bool nachfrageGesetzteSchiffe(char*);
-    virtual bool schiffsetzen(int,POSITION*,POSITION*);
+    virtual bool schiffsetzen(int,int,POSITION*,POSITION*);
 protected:
 private:
     void erneuereGraphischeOberflaeche(bool);
     void erneuereGraphischeOberflaeche(bool,SDL_Rect);
     void warten(bool);
     void fuegeBMPein(char*, SDL_Rect, bool);
+    void fuegeBMPein(char const*, SDL_Rect, bool);
     SDL_Surface* fuegeBMPein(SDL_Surface*, char*, SDL_Rect, bool);
+    SDL_Surface* fuegeBMPein(SDL_Surface*, char const*, SDL_Rect, bool);
     void kopiereSoweitmoeglichAufFenster(SDL_Surface*,SDL_Rect,bool);//kopiert die Surface aufs hintergrundfenster an die Rect Position, verkleinert die Surfacegröße aber entsprechend!
     void kopiereAusschnittAufFenster(SDL_Surface*,SDL_Rect,SDL_Rect,bool);
 

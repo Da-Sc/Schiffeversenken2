@@ -149,8 +149,9 @@ BO_GRA::BO_GRA()
     einzelFeldTreffer->w=anteilSpielfeldBreite/10.*fensterBreite-2;
 
     //test
-    ERWEITERTE_POSITION *pos=new ERWEITERTE_POSITION(1);
-    schiffsetzen(5,pos,pos);
+    POSITION *pos1=new POSITION();
+    POSITION *pos2=new POSITION();
+    schiffsetzen(0,5,pos1,pos2);
 }
 
 BO_GRA::~BO_GRA()
@@ -904,7 +905,7 @@ bool BO_GRA::nachfrageGesetzteSchiffe(char* tmpSpielfeld)
     return korrigieren;
 }
 
-bool BO_GRA::schiffsetzen(int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
+bool BO_GRA::schiffsetzen(int tmpSpieler, int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
 {
     SDL_Rect rectSchiffvertikal,rectSchiffhorizontal;
     rectSchiffvertikal=kompletterPlatzfuerSchrift;
@@ -943,8 +944,6 @@ bool BO_GRA::schiffsetzen(int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
 
     SDL_Surface* BMPschiffhorizontal=0;
     SDL_Surface* BMPschiffvertikal=0;
-    BMPschiffhorizontal = fuegeBMPein(BMPschiffhorizontal,tmpChar_pfad_horizontal,rectSchiffhorizontal,true);
-    BMPschiffvertikal = fuegeBMPein(BMPschiffvertikal,tmpChar_pfad_vertikal,rectSchiffvertikal,true);
 
     /*Uint32 farbe_blau = SDL_MapRGB(hintergrundFenster->format, 0, 0, 255);
     Uint32 farbe_gruen = SDL_MapRGB(hintergrundFenster->format, 0, 255, 0);
@@ -953,141 +952,203 @@ bool BO_GRA::schiffsetzen(int tmpLaenge, POSITION *tmpAnfang, POSITION *tmpEnde)
     SDL_FillRect(hintergrundFenster, &rectSchiffhorizontal, farbe_gruen);
     SDL_UpdateRects(hintergrundFenster,1,&rectSchiffhorizontal);*/
 
-
     bool grosseSchleifeBeenden=false;
     bool schleifeBeenden = false;
-    bool aufSchiffhorizontal;
-    bool aufSchiffvertikal;
+    bool aufSchiffhorizontal,aufSchiffvertikal;
+    bool anfangrichtig,enderichtig;
     int tmpX,tmpY;
 
-    SDL_Event ereignis; //event Container
-    while(!schleifeBeenden)
+    while(!grosseSchleifeBeenden)
     {
-        SDL_WaitEvent(&ereignis);
-        if(0 == SDL_WaitEvent(&ereignis))
+        schleifeBeenden=false;
+        BMPschiffhorizontal = fuegeBMPein(BMPschiffhorizontal,tmpChar_pfad_horizontal,rectSchiffhorizontal,true);
+        BMPschiffvertikal = fuegeBMPein(BMPschiffvertikal,tmpChar_pfad_vertikal,rectSchiffvertikal,true);
+
+        SDL_Event ereignis; //event Container
+        while(!schleifeBeenden)
         {
-            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
-            schleifeBeenden = true;
-            break;
-        }
-        //std::cout << "an event: " << std::clock() << " : " << (int)ereignis.type << std::endl;
-        switch(ereignis.type)
-        {
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEBUTTONDOWN:
-            tmpX=ereignis.button.x;
-            tmpY=ereignis.button.y;
-            aufSchiffhorizontal = (tmpX>=rectSchiffhorizontal.x && tmpX<=(rectSchiffhorizontal.x+rectSchiffhorizontal.w)) && (tmpY>=rectSchiffhorizontal.y && tmpY<=(rectSchiffhorizontal.y+rectSchiffhorizontal.h));
-            aufSchiffvertikal = (tmpX>=rectSchiffvertikal.x && tmpX<=(rectSchiffvertikal.x+rectSchiffvertikal.w)) && (tmpY>=rectSchiffvertikal.y && tmpY<=(rectSchiffvertikal.y+rectSchiffvertikal.h));
-            //wurde die maus seit dem letzten maustasten ereignis bewegt?
-            if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
+            SDL_WaitEvent(&ereignis);
+            if(0 == SDL_WaitEvent(&ereignis))
             {
-                //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
+                std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+                schleifeBeenden = true;
+                break;
+            }
+            //std::cout << "an event: " << std::clock() << " : " << (int)ereignis.type << std::endl;
+            switch(ereignis.type)
+            {
+            case SDL_MOUSEBUTTONUP:
+            case SDL_MOUSEBUTTONDOWN:
+                tmpX=ereignis.button.x;
+                tmpY=ereignis.button.y;
+                //in methode schreiben
+                aufSchiffhorizontal = (tmpX>=rectSchiffhorizontal.x && tmpX<=(rectSchiffhorizontal.x+rectSchiffhorizontal.w)) && (tmpY>=rectSchiffhorizontal.y && tmpY<=(rectSchiffhorizontal.y+rectSchiffhorizontal.h));
+                aufSchiffvertikal = (tmpX>=rectSchiffvertikal.x && tmpX<=(rectSchiffvertikal.x+rectSchiffvertikal.w)) && (tmpY>=rectSchiffvertikal.y && tmpY<=(rectSchiffvertikal.y+rectSchiffvertikal.h));
+                //wurde die maus seit dem letzten maustasten ereignis bewegt?
+                if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
+                {
+                    //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
+                    if(aufSchiffhorizontal)
+                    {
+                        //Schiffhorizontal
+                        schleifeBeenden=true;
+                        //std::cout << "horizontales Schiff" << std::endl;
+                    }
+                    else if(aufSchiffvertikal)
+                    {
+                        //Schiffvertikal
+                        schleifeBeenden=true;
+                        //std::cout << "vertikales Schiff" << std::endl;
+                    }
+                }
+                altPixelX=tmpX;
+                altPixelY=tmpY;
+                break;
+            case SDL_QUIT:
+                schleifeBeenden = true;
+                exit(-1);
+                break;
+            default:
+                break;
+            }
+        }
+
+        erneuereGraphischeOberflaeche(true,rectSchiffhorizontal);
+        erneuereGraphischeOberflaeche(true,rectSchiffvertikal);
+
+        schleifeBeenden=false;
+        while(!schleifeBeenden)
+        {
+            if(0 == SDL_WaitEvent(&ereignis))
+            {
+                std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
+                schleifeBeenden = true;
+                break;
+            }
+            switch(ereignis.type)
+            {
+            case SDL_MOUSEMOTION:
                 if(aufSchiffhorizontal)
                 {
-                    //Schiffhorizontal
-                    schleifeBeenden=true;
-                    //std::cout << "horizontales Schiff" << std::endl;
-                }
-                else if(aufSchiffvertikal)
-                {
-                    //Schiffvertikal
-                    schleifeBeenden=true;
-                    //std::cout << "vertikales Schiff" << std::endl;
-                }
-            }
-            altPixelX=tmpX;
-            altPixelY=tmpY;
-            break;
-        case SDL_QUIT:
-            schleifeBeenden = true;
-            exit(-1);
-            break;
-        default:
-            break;
-        }
-    }
-
-    erneuereGraphischeOberflaeche(true,rectSchiffhorizontal);
-    erneuereGraphischeOberflaeche(true,rectSchiffvertikal);
-
-    schleifeBeenden=false;
-    while(!schleifeBeenden)
-    {
-        if(0 == SDL_WaitEvent(&ereignis))
-        {
-            std::cerr << "Fehler beim Warten auf Benutzerinteraktion." << std::endl;
-            schleifeBeenden = true;
-            break;
-        }
-        switch(ereignis.type)
-        {
-        case SDL_MOUSEMOTION:
-            if(aufSchiffhorizontal)
-            {
-                erneuereGraphischeOberflaeche(true, rectSchiffhorizontal);
-                if(tmpLaenge%2!=0)
-                {
-                    rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w/2.);
-                    rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
-                }
-                else if(tmpLaenge==4)
-                {
-                    rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w*(1./4.+1./8.));
-                    rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                    erneuereGraphischeOberflaeche(true, rectSchiffhorizontal);
+                    if(tmpLaenge%2!=0)
+                    {
+                        rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w/2.);
+                        rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                    }
+                    else if(tmpLaenge==4)
+                    {
+                        rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w*(1./4.+1./8.));
+                        rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                    }
+                    else
+                    {
+                        rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w*(1./4.));
+                        rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                    }
+                    kopiereSoweitmoeglichAufFenster(BMPschiffhorizontal,rectSchiffhorizontal,true);
                 }
                 else
                 {
-                    rectSchiffhorizontal.x = ereignis.motion.x-(rectSchiffhorizontal.w*(1./4.));
-                    rectSchiffhorizontal.y = ereignis.motion.y-(rectSchiffhorizontal.h/2.);
+                    erneuereGraphischeOberflaeche(true, rectSchiffvertikal);
+                    if(tmpLaenge%2!=0)
+                    {
+                        rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                        rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h/2.);
+                    }
+                    else if(tmpLaenge==4)
+                    {
+                        rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                        rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h*(1./4.+1./8.));
+                    }
+                    else
+                    {
+                        rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
+                        rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h*(1./4.));
+                    }
+                    kopiereSoweitmoeglichAufFenster(BMPschiffvertikal,rectSchiffvertikal,true);
                 }
-                kopiereSoweitmoeglichAufFenster(BMPschiffhorizontal,rectSchiffhorizontal,true);
-            }
-            else
-            {
-                erneuereGraphischeOberflaeche(true, rectSchiffvertikal);
-                if(tmpLaenge%2!=0)
+                break;
+            case SDL_MOUSEBUTTONUP:
+            case SDL_MOUSEBUTTONDOWN:
+                tmpX=ereignis.button.x;
+                tmpY=ereignis.button.y;
+                //wurde die maus seit dem letzten maustasten ereignis bewegt?
+                if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
                 {
-                    rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
-                    rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h/2.);
+                    if(tmpAnfang->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpAnfang->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
+                    {
+                        //zumindest die Mausposition passt
+                        if(tmpLaenge%2!=0)
+                        {
+                            if(aufSchiffhorizontal)
+                            {
+                                anfangrichtig = (tmpAnfang->setzePositionX( (pixelPositionzuFeldNrX(tmpX,tmpSpieler)-(int)(tmpLaenge/2)) ) && tmpAnfang->setzePositionY( pixelPositionzuFeldNrY(tmpY)));
+                                enderichtig = ( tmpEnde->setzePositionX((pixelPositionzuFeldNrX(tmpX,tmpSpieler)+(int)(tmpLaenge/2))) && tmpEnde->setzePositionY( pixelPositionzuFeldNrY(tmpY)) );
+                                if( anfangrichtig && enderichtig )
+                                {
+                                    schleifeBeenden=true;
+                                    grosseSchleifeBeenden=true;
+                                }
+                            }
+                            else //aufSchiffvertikal
+                            {
+                                anfangrichtig = (tmpAnfang->setzePositionX( (pixelPositionzuFeldNrX(tmpX,tmpSpieler)) ) && tmpAnfang->setzePositionY( pixelPositionzuFeldNrY(tmpY)-(int)(tmpLaenge/2)));
+                                enderichtig = ( tmpEnde->setzePositionX((pixelPositionzuFeldNrX(tmpX,tmpSpieler))) && tmpEnde->setzePositionY( pixelPositionzuFeldNrY(tmpY)+(int)(tmpLaenge/2)) );
+                                if(anfangrichtig && enderichtig)
+                                {
+                                    schleifeBeenden=true;
+                                    grosseSchleifeBeenden=true;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        schleifeBeenden=true;
+                    }
                 }
-                else if(tmpLaenge==4)
-                {
-                    rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
-                    rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h*(1./4.+1./8.));
-                }
-                else
-                {
-                    rectSchiffvertikal.x = ereignis.motion.x-(rectSchiffvertikal.w/2.);
-                    rectSchiffvertikal.y = ereignis.motion.y-(rectSchiffvertikal.h*(1./4.));
-                }
-                kopiereSoweitmoeglichAufFenster(BMPschiffvertikal,rectSchiffvertikal,true);
-            }
-            break;
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEBUTTONDOWN:
-            tmpX=ereignis.button.x;
-            tmpY=ereignis.button.y;
-            //wurde die maus seit dem letzten maustasten ereignis bewegt?
-            if(ereignis.button.button == SDL_BUTTON_LEFT && (betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10))
-            {
-                //if(tmpposition->setzePositionX(pixelPositionzuFeldNrX(tmpX,tmpSpieler)) && tmpposition->setzePositionY(pixelPositionzuFeldNrY(tmpY)))
-                //Position setzen-> false ->große schleife nicht beenden neu von 1. schleife
-                //               -> ok links und rechts testen, versuchen in anfang und end Positionen zu speichern
-            }
-            altPixelX=tmpX;
-            altPixelY=tmpY;
-            break;
-        case SDL_QUIT:
-            schleifeBeenden = true;
-            exit(0);
-            break;
-        default:
-            break;
-        } // switch(event.type)
-    } // while(!schleifeBeenden)
+                altPixelX=tmpX;
+                altPixelY=tmpY;
+                break;
+            case SDL_QUIT:
+                schleifeBeenden = true;
+                exit(0);
+                break;
+            default:
+                break;
+            } // switch(event.type)
+        } // while(!schleifeBeenden)
+        //das ganze nach oben -> nur einmal machen
+        if(aufSchiffhorizontal)
+        {
+            erneuereGraphischeOberflaeche(true, rectSchiffhorizontal);
+        }
+        else if(aufSchiffvertikal)
+        {
+            erneuereGraphischeOberflaeche(true, rectSchiffvertikal);
+        }
+        if(!grosseSchleifeBeenden)
+        {
+            rectSchiffhorizontal=kompletterPlatzfuerSchrift;
+            rectSchiffhorizontal.x+=fensterBreite*(1./3.+anteilSpielfeldBreite/10.);
+            rectSchiffhorizontal.h=fensterHoehe*(anteilSpielfeldHoehe/10.)-1;
+            rectSchiffhorizontal.w=(fensterBreite*(anteilSpielfeldBreite/10.)-1)*tmpLaenge;
 
-    warten(false);//später natürlich entfernen
+            rectSchiffvertikal=kompletterPlatzfuerSchrift;
+            rectSchiffvertikal.x+=fensterBreite/3.;
+            rectSchiffvertikal.h=(fensterHoehe*(anteilSpielfeldHoehe/10.)-1)*tmpLaenge;
+            rectSchiffvertikal.w=fensterBreite*(anteilSpielfeldBreite/10.)-1;
+
+            kopiereSoweitmoeglichAufFenster(BMPschiffhorizontal,rectSchiffhorizontal,true);
+            kopiereSoweitmoeglichAufFenster(BMPschiffvertikal,rectSchiffvertikal,true);
+        }
+        //erneuern der schiffpositionen!
+    }//while(!grosseSchleifeBeenden)
+
+    //warten(false);
+
+    //std::cout << "Anfang x: " << tmpAnfang->holeX() << " y: " << tmpAnfang->holeY() << " Ende x: " << tmpEnde->holeX() << " y: " << tmpEnde->holeY() << std::endl;
     return true;
 }
 
@@ -1114,7 +1175,50 @@ void BO_GRA::fuegeBMPein(char* tmpPfad, SDL_Rect tmpPosition, bool erneuern)
     }
 }
 
+void BO_GRA::fuegeBMPein(char const* tmpPfad, SDL_Rect tmpPosition, bool erneuern)
+{
+    SDL_Surface *tmpBMP = SDL_LoadBMP(tmpPfad);
+    if (tmpBMP==0)
+    {
+            std::cout << "Grafik in " << tmpPfad << " nicht verfuegbar." << std::endl;
+            std::cin.get();
+            exit(-1);
+    }
+
+    tmpBMP->w=tmpPosition.w;
+    tmpBMP->h=tmpPosition.h;
+
+    SDL_BlitSurface(tmpBMP,0,hintergrundFenster,&tmpPosition);
+
+    if(erneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+
+    if(tmpBMP!=0)
+    {
+            SDL_FreeSurface(tmpBMP);
+    }
+}
+
 SDL_Surface* BO_GRA::fuegeBMPein(SDL_Surface* zurueckzugebendesBild, char* tmpPfad, SDL_Rect tmpPosition, bool erneuern)
+{
+    zurueckzugebendesBild = SDL_LoadBMP(tmpPfad);
+    if (zurueckzugebendesBild==0)
+    {
+        std::cout << "Grafik in " << tmpPfad << " nicht verfuegbar." << std::endl;
+        std::cin.get();
+        exit(-1);
+    }
+
+    zurueckzugebendesBild->w=tmpPosition.w;
+    zurueckzugebendesBild->h=tmpPosition.h;
+
+    SDL_BlitSurface(zurueckzugebendesBild,0,hintergrundFenster,&tmpPosition);
+
+    if(erneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+
+    return zurueckzugebendesBild;
+}
+
+SDL_Surface* BO_GRA::fuegeBMPein(SDL_Surface* zurueckzugebendesBild, char const* tmpPfad, SDL_Rect tmpPosition, bool erneuern)
 {
     zurueckzugebendesBild = SDL_LoadBMP(tmpPfad);
     if (zurueckzugebendesBild==0)

@@ -30,7 +30,7 @@ class BO_KOM : public BO
         virtual void ausgabeVersenkt();
         virtual void spieleranderReihe(int, bool);
         virtual bool nachfrageGesetzteSchiffe(char*);
-        virtual bool schiffsetzen(int,POSITION*,POSITION*){return true;}
+        virtual bool schiffsetzen(int,int,POSITION*,POSITION*){return true;}
     protected:
         //bool zustand;//true = Alles OK, false = upps Fehler
         //bool hinweisausgegeben;

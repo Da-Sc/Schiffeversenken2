@@ -22,7 +22,7 @@ public:
     virtual void ausgabeVersenkt()=0;
     virtual void spieleranderReihe(int, bool)=0;
     virtual bool nachfrageGesetzteSchiffe(char*)=0;
-    virtual bool schiffsetzen(int,POSITION*,POSITION*)=0;
+    virtual bool schiffsetzen(int,int,POSITION*,POSITION*)=0;
 protected:
     bool zustand;//true = Alles OK, false = upps Fehler
     bool hinweisausgegeben;
