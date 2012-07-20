@@ -41,6 +41,9 @@ private:
     SDL_Surface* fuegeBMPein(SDL_Surface*, char const*, SDL_Rect, bool);
     void kopiereSoweitmoeglichAufFenster(SDL_Surface*,SDL_Rect,bool);//kopiert die Surface aufs hintergrundfenster an die Rect Position, verkleinert die Surfacegröße aber entsprechend!
     void kopiereAusschnittAufFenster(SDL_Surface*,SDL_Rect,SDL_Rect,bool);
+    TTF_Font* ladeSchriftart(int groesse, TTF_Font* zurueckzugebenderFont);
+    void fuellemitFarbe(Uint32 farbe, SDL_Rect ort, bool zeichne);
+    void fuellemitFarbe(Uint32 farbe, bool zeichne);
 
     //Umrechnung von Feldindizes zu Pixelkoordinaten und umgekehrt
     //Umstellen auf SDL_Rect ?!?!
@@ -68,6 +71,9 @@ private:
     char *letzteSpielfeldausgabe;
     //abfangen von doppelten ereignissen, da muastaste gedrückt und hoch dasselbe auslösen (->nur so aktzeptable sensitivität)
     int altPixelX,altPixelY;
+    bool mausBewegt(int x_neu, int y_neu);
+    Uint8 SDL_KEYempfindlichAUF;
+    bool ersterwartenaufruf;
 
     //für Textausgabe:
     bool neumachen;
