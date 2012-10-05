@@ -11,8 +11,10 @@ class EINZELNES_FELD
         virtual bool istSchiff();
         virtual bool istVersenkt();
         bool istGetroffen();
+        char holeTyp();
     protected:
         bool getroffen;
+        char typ;
     private:
 };
 

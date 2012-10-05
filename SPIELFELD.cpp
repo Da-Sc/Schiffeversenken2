@@ -57,6 +57,7 @@ bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, in
 {
 	int tmpSchifflaenge = gesetzteSchiffe[tmpSchiffnummer]->holeSchifflaenge();
     ERWEITERTE_POSITION *xy = new ERWEITERTE_POSITION(tmpSchifflaenge);
+    bool senkrecht=false;
 
 	for(int i=0; i<2; i++)
 	{
@@ -64,26 +65,29 @@ bool SPIELFELD::setzeSchiff(POSITION* positionAnfang, POSITION* positionEnde, in
 	}
 	//überprüfen: passt die Länge, ist es eine reihe
 	//setze einzelne Positionen
-        if( (positionAnfang->holeX()==positionEnde->holeX() && betrag(positionAnfang->holeY()-positionEnde->holeY())+1==tmpSchifflaenge) )
+    //senkrecht
+    if( (positionAnfang->holeX()==positionEnde->holeX() && betrag(positionAnfang->holeY()-positionEnde->holeY())+1==tmpSchifflaenge) )
 	{
-		for(int i=0; i<tmpSchifflaenge; i++)
-		{
-                        xy->setzePositionX(i,positionAnfang->holeX());
-                        xy->setzePositionY(i,kleineres(positionAnfang->holeY(),positionEnde->holeY())+i);
-		}
+        for(int i=0; i<tmpSchifflaenge; i++)
+        {
+            xy->setzePositionX(i,positionAnfang->holeX());
+            xy->setzePositionY(i,kleineres(positionAnfang->holeY(),positionEnde->holeY())+i);
+        }
+        senkrecht=true;
 	}
-        else if( (positionAnfang->holeY()==positionEnde->holeY() && betrag(positionAnfang->holeX()-positionEnde->holeX())+1==tmpSchifflaenge) )
+    //waagrecht
+    else if( (positionAnfang->holeY()==positionEnde->holeY() && betrag(positionAnfang->holeX()-positionEnde->holeX())+1==tmpSchifflaenge) )
 	{
-		for(int i=0; i<tmpSchifflaenge; i++)
-		{
-                        xy->setzePositionY(i,positionAnfang->holeY());
-                        xy->setzePositionX(i,kleineres(positionAnfang->holeX(),positionEnde->holeX())+i);
-		}
+        for(int i=0; i<tmpSchifflaenge; i++)
+        {
+            xy->setzePositionY(i,positionAnfang->holeY());
+            xy->setzePositionX(i,kleineres(positionAnfang->holeX(),positionEnde->holeX())+i);
+        }
 	}
     else return false;
 
     if(istdaeinSchiff(xy)) return false;
-    if(!gesetzteSchiffe[tmpSchiffnummer]->setzeaufSpielfeld(xy)) return false;
+    if(!gesetzteSchiffe[tmpSchiffnummer]->setzeaufSpielfeld(xy,senkrecht)) return false;
 
     delete xy;
     return true;
@@ -134,7 +138,7 @@ void SPIELFELD::Schiffversenkt()
 {
     AnzahlnochschwimmenderSchiffe--;
 }
-
+#include <iostream>
 char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
 //Rückgabe:
 //Schiff: s
@@ -143,7 +147,7 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
 //Wasser oder unbekannt: -
 //Wassertreffer: W
 {
-    char schiff = 's';
+    //char schiff = 's';
     char schiffstreffer = 'X';
     char schiffversenkt = 'V';
     char unbekannt = '-';
@@ -166,7 +170,11 @@ char SPIELFELD::zeigeSpielfeldteilfuer(int tmpSpieler, int tmpx, int tmpy)
                 }
                 else{return schiffstreffer;}
             }
-            else{return schiff;}
+            //else{return schiff;}
+            else
+            {
+                return Feld[tmpx][tmpy]->holeTyp();
+            }
         }
         //->Wasser
         else

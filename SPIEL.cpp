@@ -71,6 +71,7 @@ void SPIEL::setzeSchiffe(int Spieler)
         if(falschgestzt) Meer[Spieler]->entferneSchiffe();
         for(int i=0; i<AnzahlSchiffe; i++)
         {
+            BO_VERWALTUNG::holeInstanz()->spielfeldAusgabe(zeigeSpielfelder(Spieler));
             /*BO_VERWALTUNG::holeInstanz()->textAusgeben("Schiff ",false); //bei allen ausgeben -> anderer Spieler auch informiert
             BO_VERWALTUNG::holeInstanz()->zahlAusgeben(i+1,false);
             BO_VERWALTUNG::holeInstanz()->textAusgeben(" (Länge: ",false);

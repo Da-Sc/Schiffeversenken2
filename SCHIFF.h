@@ -16,7 +16,7 @@ class SCHIFF
         virtual ~SCHIFF();
         void legeSchifflaengefest(int);
         int holeSchifflaenge();
-        bool setzeaufSpielfeld(ERWEITERTE_POSITION*);
+        bool setzeaufSpielfeld(ERWEITERTE_POSITION*, bool senkrecht);
         bool istVersenkt();
         void getroffen();
     protected:

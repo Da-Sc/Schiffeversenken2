@@ -46,6 +46,7 @@ private:
     void fuellemitFarbe(Uint32 farbe, SDL_Rect ort, bool zeichne);
     void fuellemitFarbe(Uint32 farbe, bool zeichne);
     SDL_Surface* erstelleLeereOberflaeche(int breite,int hoehe);
+    void ladePfade();
 
     bool rechteckgetroffen(SDL_Rect rechteck, int x, int y);
 
@@ -70,6 +71,7 @@ private:
     SDL_Surface *einzelFeldSchiff;
     SDL_Surface *einzelFeldVersenkt;
     SDL_Surface *einzelFeldTreffer;
+    SDL_Surface* einzelFeldSchiffteile[28];
 
     //zum erneuern der oberflaeche
     char *letzteSpielfeldausgabe;

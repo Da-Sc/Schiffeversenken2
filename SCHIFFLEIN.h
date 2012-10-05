@@ -10,11 +10,12 @@ class SCHIFFLEIN : public EINZELNES_FELD
 {
     public:
         SCHIFFLEIN();
-        SCHIFFLEIN(SCHIFF*);
+        SCHIFFLEIN(SCHIFF* zugehoerigesSchiff, int laenge, int position);
         virtual ~SCHIFFLEIN();
         virtual bool istSchiff();
         virtual bool istVersenkt();
         virtual bool beschossen();
+        void setzesenkrecht(bool senkrecht);
     protected:
     private:
         SCHIFF* oberSchiff;

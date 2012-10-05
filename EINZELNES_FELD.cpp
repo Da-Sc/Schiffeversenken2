@@ -3,6 +3,7 @@
 EINZELNES_FELD::EINZELNES_FELD()
 {
     getroffen=false;
+    typ='W';
     //ctor
 }
 
@@ -28,4 +29,9 @@ bool EINZELNES_FELD::istVersenkt()
 bool EINZELNES_FELD::istGetroffen()
 {
     return getroffen;
+}
+
+char EINZELNES_FELD::holeTyp()
+{
+    return typ;
 }

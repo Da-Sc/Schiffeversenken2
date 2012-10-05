@@ -40,7 +40,7 @@ void SCHIFF::legeSchifflaengefest(int tmplaenge)
     ausSchiffleinBestehend=new SCHIFFLEIN*[Schifflaenge];
     for(int i=0; i<Schifflaenge; i++)
     {
-        ausSchiffleinBestehend[i]=new SCHIFFLEIN(this);
+        ausSchiffleinBestehend[i]=new SCHIFFLEIN(this,Schifflaenge,i);
     }
 }
 
@@ -49,13 +49,14 @@ int SCHIFF::holeSchifflaenge()
 	return Schifflaenge;
 }
 
-bool SCHIFF::setzeaufSpielfeld(ERWEITERTE_POSITION* xy)
+bool SCHIFF::setzeaufSpielfeld(ERWEITERTE_POSITION* xy, bool senkrecht)
 {
     if(xy->holeLaenge()!=Schifflaenge)return false;
     for(int i=0; i<Schifflaenge; i++)
     {
         if(xy->holeX(i)<0 || xy->holeY(i)<0) return false;
         if(!aufFeld->ersetzedurchSchifflein(ausSchiffleinBestehend[i],xy->holeX(i),xy->holeY(i))) return false;
+        ausSchiffleinBestehend[i]->setzesenkrecht(senkrecht);
     }
     positionenSchifflein = new ERWEITERTE_POSITION(xy);//bringt das überhaupt was?
     return true;
