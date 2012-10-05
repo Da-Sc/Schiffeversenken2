@@ -60,7 +60,8 @@ BO_GRA::BO_GRA()
     }
 
     // Zeichenfläche erstellen
-    hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe, fensterFarbtiefe, SDL_SWSURFACE);
+    hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe, fensterFarbtiefe, SDL_SWSURFACE);//http://wiki.delphigl.com/index.php/SDL_Surface
+    //hintergrundFenster = SDL_SetVideoMode(fensterBreite, fensterHoehe, fensterFarbtiefe, SDL_HWSURFACE);
     if (hintergrundFenster==0)
     {
             std::cout << "Fehler beim Erzeugen der Oberflche." << std::endl;
@@ -454,7 +455,7 @@ void BO_GRA::warten(bool erneuern)
     //SDL_UpdateRects(hintergrundFenster,1,&ausgabeFeldOben);
     fuellemitFarbe(farbe_weiss,ausgabeFeldOben,true);
 
-    if(erneuern) erneuereGraphischeOberflaeche(true);
+    if(erneuern) zuruecksetzenGraphischeOberflaeche(true);
 }
 
 void BO_GRA::begruessung()
@@ -710,7 +711,7 @@ void BO_GRA::gewinnerAusgeben(int tmpGewinner)
     warten(false);
 }
 
-void BO_GRA::erneuereGraphischeOberflaeche(bool auchletzterStatus)
+void BO_GRA::zuruecksetzenGraphischeOberflaeche(bool auchletzterStatus)//erneuereGraphischeOberflaeche(bool auchletzterStatus)
 {
     // Fülle Zeichenfläche mit Farbe
     //SDL_FillRect(hintergrundFenster, 0, farbe_weiss);
@@ -885,7 +886,7 @@ bool BO_GRA::nachfrageGesetzteSchiffe(char* tmpSpielfeld)
         kopiereArray<char>(tmpSpielfeld,letzteSpielfeldausgabe,200);
         letzteSpielfeldausgabe[200]=0;
     }
-    erneuereGraphischeOberflaeche(true);
+    zuruecksetzenGraphischeOberflaeche(true);
 
     textAusgeben("Wollen sie die Orte ihrer Schiffe korrigieren? (j,n)",true);
     bool korrigieren=false;
@@ -919,7 +920,7 @@ bool BO_GRA::nachfrageGesetzteSchiffe(char* tmpSpielfeld)
             exit(-1);
         }
     }
-    erneuereGraphischeOberflaeche(false);
+    zuruecksetzenGraphischeOberflaeche(false);
     return korrigieren;
 }
 
@@ -1000,8 +1001,8 @@ bool BO_GRA::schiffsetzen(int tmpSpieler, int tmpLaenge, POSITION *tmpAnfang, PO
                 tmpX=ereignis.button.x;
                 tmpY=ereignis.button.y;
                 //in methode schreiben
-                aufSchiffhorizontal = (tmpX>=rectSchiffhorizontal.x && tmpX<=(rectSchiffhorizontal.x+rectSchiffhorizontal.w)) && (tmpY>=rectSchiffhorizontal.y && tmpY<=(rectSchiffhorizontal.y+rectSchiffhorizontal.h));
-                aufSchiffvertikal = (tmpX>=rectSchiffvertikal.x && tmpX<=(rectSchiffvertikal.x+rectSchiffvertikal.w)) && (tmpY>=rectSchiffvertikal.y && tmpY<=(rectSchiffvertikal.y+rectSchiffvertikal.h));
+                aufSchiffhorizontal = rechteckgetroffen(rectSchiffhorizontal,tmpX,tmpY); //(tmpX>=rectSchiffhorizontal.x && tmpX<=(rectSchiffhorizontal.x+rectSchiffhorizontal.w)) && (tmpY>=rectSchiffhorizontal.y && tmpY<=(rectSchiffhorizontal.y+rectSchiffhorizontal.h));
+                aufSchiffvertikal = rechteckgetroffen(rectSchiffvertikal,tmpX,tmpY);//(tmpX>=rectSchiffvertikal.x && tmpX<=(rectSchiffvertikal.x+rectSchiffvertikal.w)) && (tmpY>=rectSchiffvertikal.y && tmpY<=(rectSchiffvertikal.y+rectSchiffvertikal.h));
                 //wurde die maus seit dem letzten maustasten ereignis bewegt?
                 if(ereignis.button.button == SDL_BUTTON_LEFT && mausBewegt(tmpX,tmpY)/*(betrag<double>(tmpX-altPixelX)>10 || betrag<double>(tmpY-altPixelY)>10)*/)
                 {
@@ -1308,6 +1309,42 @@ SDL_Surface* BO_GRA::fuegeBMPein(SDL_Surface* zurueckzugebendesBild, char const*
     return zurueckzugebendesBild;
 }
 
+//void BO_GRA::kopiereSoweitmoeglichAufFenster(SDL_Surface* tmpzukopieren,SDL_Rect tmpPosition,bool teilerneuern)
+SDL_Surface BO_GRA::kopiereSoweitmoeglichAufFenster(SDL_Surface* tmpzukopieren,SDL_Surface* altesOberflaechenteil,SDL_Rect tmpPosition,bool teilerneuern)
+{
+    if(tmpzukopieren!=0)
+    {
+        if(tmpzukopieren->w >= tmpPosition.w)
+        {
+            tmpzukopieren->w=tmpPosition.w;
+        }
+        else
+        {
+            tmpPosition.w = tmpzukopieren->w;
+        }
+        if(tmpzukopieren->h >= tmpPosition.h)
+        {
+            tmpzukopieren->h=tmpPosition.h;
+        }
+        else
+        {
+            tmpPosition.h = tmpzukopieren->h;
+        }
+
+        altesOberflaechenteil = erstelleLeereOberflaeche(tmpPosition.w,tmpPosition.h);
+        SDL_BlitSurface(hintergrundFenster,&tmpPosition,altesOberflaechenteil,0);
+
+        SDL_BlitSurface(tmpzukopieren,0,hintergrundFenster,&tmpPosition);//falls tmpPosition nicht im Fenster wirds entsprechend verkleinert -> damit kein Absturz in UpdateRects!
+        if(teilerneuern) SDL_UpdateRects(hintergrundFenster,1,&tmpPosition);
+    }
+    else
+    {
+        altesOberflaechenteil = erstelleLeereOberflaeche(1,1);
+        SDL_FillRect(altesOberflaechenteil, 0, farbe_weiss);
+    }
+    return *altesOberflaechenteil;
+}
+
 void BO_GRA::kopiereSoweitmoeglichAufFenster(SDL_Surface* tmpzukopieren,SDL_Rect tmpPosition,bool teilerneuern)
 {
     if(tmpzukopieren!=0)
@@ -1374,6 +1411,18 @@ bool BO_GRA::mausBewegt(int x_neu, int y_neu)
         return true;
     }
     else return false;
-
 }
 
+bool BO_GRA::rechteckgetroffen(SDL_Rect rechteck,int x,int y)
+{
+    return (x>=rechteck.x && x<=(rechteck.x+rechteck.w)) && (y>=rechteck.y && y<=(rechteck.y+rechteck.h));
+}
+
+SDL_Surface* BO_GRA::erstelleLeereOberflaeche(int breite,int hoehe)
+{
+  // 'display' is the surface whose format you want to match
+  //  if this is really the display format, then use the surface returned from SDL_SetVideoMode
+
+  const SDL_PixelFormat& pixelFormat = *(hintergrundFenster->format);
+  return SDL_CreateRGBSurface(SDL_SWSURFACE,breite,hoehe,pixelFormat.BitsPerPixel,pixelFormat.Rmask,pixelFormat.Gmask,pixelFormat.Bmask,pixelFormat.Amask );
+}

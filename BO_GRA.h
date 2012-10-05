@@ -32,7 +32,7 @@ public:
     virtual bool schiffsetzen(int,int,POSITION*,POSITION*);
 protected:
 private:
-    void erneuereGraphischeOberflaeche(bool);
+    void zuruecksetzenGraphischeOberflaeche(bool);
     void erneuereGraphischeOberflaeche(bool,SDL_Rect);
     void warten(bool);
     void fuegeBMPein(char*, SDL_Rect, bool);
@@ -40,10 +40,14 @@ private:
     SDL_Surface* fuegeBMPein(SDL_Surface*, char*, SDL_Rect, bool);
     SDL_Surface* fuegeBMPein(SDL_Surface*, char const*, SDL_Rect, bool);
     void kopiereSoweitmoeglichAufFenster(SDL_Surface*,SDL_Rect,bool);//kopiert die Surface aufs hintergrundfenster an die Rect Position, verkleinert die Surfacegröße aber entsprechend!
+    SDL_Surface kopiereSoweitmoeglichAufFenster(SDL_Surface* tmpzukopieren,SDL_Surface* altesOberflaechenteil,SDL_Rect,bool);
     void kopiereAusschnittAufFenster(SDL_Surface*,SDL_Rect,SDL_Rect,bool);
     TTF_Font* ladeSchriftart(int groesse, TTF_Font* zurueckzugebenderFont);
     void fuellemitFarbe(Uint32 farbe, SDL_Rect ort, bool zeichne);
     void fuellemitFarbe(Uint32 farbe, bool zeichne);
+    SDL_Surface* erstelleLeereOberflaeche(int breite,int hoehe);
+
+    bool rechteckgetroffen(SDL_Rect rechteck, int x, int y);
 
     //Umrechnung von Feldindizes zu Pixelkoordinaten und umgekehrt
     //Umstellen auf SDL_Rect ?!?!
